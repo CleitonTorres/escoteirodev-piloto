@@ -1,37 +1,30 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./src/css/styles.css">
 </head>
+
 <body id="body">
     <nav class="menu" onmouseleave="removeClass('showSubItem', 'boxSubItem')">
         <ul class="itemTitle" onmouseenter="addClass('showSubItem', 'boxSubItem')">
             <li>Meus Projetos</li>
-            <ul 
-                class="boxSubItem"
-                id="boxSubItem" 
-                onmouseleave="removeClass('showSubItem', 'boxSubItem')"
-            >
+            <ul class="boxSubItem" id="boxSubItem" onmouseleave="removeClass('showSubItem', 'boxSubItem')">
                 <li class="subItem">
                     <a href="./src/jogoKaa/jogoKaa.html">Jogo da Kaa</a>
                 </li>
                 <li class="subItem">
                     <a href="./src/scoutPlat/scoutPlat.html">Escoteiro Plat</a>
                 </li>
-                <li class="subItem"></li>
-                    <a href="./src/efeitosFrontend/efeitosFrontend.html">Efeitos Frontend</a>
-                </li>
-            </ul>       
+            </ul>
         </ul>
     </nav>
 
     <div class="perfil">
         <div class="boxFotoPerfil" title="imagem de teste">
-            <img 
-                src="./src/assets/foto2.png" 
-            />
+            <img src="./src/assets/foto2.png" />
         </div>
         <span title="Teste">Cleiton T. Machado</span>
     </div>
@@ -49,7 +42,8 @@
         <div class="boxConteiner">
             <span>Meus objetivos</span>
             <p>
-                Sed non porta sapien, et vulputate tellus. Integer maximus lorem ac erat auctor, id dapibus risus vulputate. Ut vulputate, orci ut sollicitudin lobortis, nunc lorem gravida odio.
+                Sed non porta sapien, et vulputate tellus. Integer maximus lorem ac erat auctor, id dapibus risus
+                vulputate. Ut vulputate, orci ut sollicitudin lobortis, nunc lorem gravida odio.
             </p>
         </div>
         <div class="boxConteiner">
@@ -64,4 +58,5 @@
     </div>
     <script src="./src/scripts/scripts.js"></script>
 </body>
+
 </html>
