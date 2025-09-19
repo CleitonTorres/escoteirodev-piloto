@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
+
     const gridSize = 20;
     const tileCount = canvas.width / gridSize;
     let snake = [{ x: 10, y: 10 }];
@@ -10,11 +11,49 @@ document.addEventListener('DOMContentLoaded', () => {
     let yVelocity = 0;
     let score = 0; // Inicializa a pontuação
 
+    const headImg = new Image();
+    const bodyImg = new Image();
+    const tailImg = new Image();
+
+    headImg.src = './src/assets/kaa/kaa-head.png';
+    bodyImg.src = './src/assets/kaa/kaa-body.png';
+    tailImg.src = './src/assets/kaa/kaa-calda.png';
+
     function drawSnake() {
         ctx.fillStyle = 'green';
-        snake.forEach((segment) => {
-            //posição x (posição grid * largura do grid) e y (posição grid * altura do grid), largura x e y.
+        snake.forEach((segment, index) => {
+            
             ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+            
+            //posição x (posição grid * largura do grid) e y (posição grid * altura do grid), largura x e y.
+            
+            // const { x, y } = segment;
+            // const pixelX = x * gridSize;
+            // const pixelY = y * gridSize;
+            
+            // if (index === 0) {
+            //     // Cabeça
+            //     ctx.drawImage(headImg, pixelX, pixelY, gridSize, gridSize);
+            // } 
+            // else if (index === snake.length - 1) {
+            //     // Calda
+            //     ctx.drawImage(tailImg, pixelX, pixelY, gridSize, gridSize);
+            // } else {
+            //     // Corpo com rotação se estiver na horizontal
+            //     ctx.save(); // salva o estado original do canvas
+
+            //     if (xVelocity !== 0) {
+            //         // mover o ponto de origem para o centro da célula do corpo
+            //         ctx.translate(pixelX + gridSize / 2, pixelY + gridSize / 2);
+            //         ctx.rotate(Math.PI / 2); // 90 graus
+            //         // desenha a imagem rotacionada de volta com offset de -halfWidth/-halfHeight
+            //         ctx.drawImage(bodyImg, -gridSize / 2, -gridSize / 2, gridSize, gridSize);
+            //     } else {
+            //         ctx.drawImage(bodyImg, pixelX, pixelY, gridSize, gridSize);
+            //     }
+    
+            //     ctx.restore(); // restaura o estado original
+            // }
         });
     }
 
@@ -109,7 +148,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100);
     }
 
-    loop();
+    Promise.all([
+        new Promise(res => headImg.onload = res),
+        new Promise(res => bodyImg.onload = res),
+        new Promise(res => tailImg.onload = res)
+    ]).then(() => {
+        loop(); // inicia o jogo só depois que os sprites estão prontos
+    });
 
     document.addEventListener('keydown', (e) => {
         e.preventDefault();

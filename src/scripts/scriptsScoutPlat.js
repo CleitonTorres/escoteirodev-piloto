@@ -6,16 +6,16 @@ let currentPlayer = {name: '', score: 0, character: ''};
 let namesPlayers = [];
 
 const efeitos = {
-    screenInicial: "../audios/trilhaSonora/Juhani Junkala [Retro Game Music Pack] Title Screen.wav",
-    jump: "../audios/efeitos/drop_004.ogg",
-    colision: "../audios/efeitos/impactWood_medium_001.ogg",
-    hit: "../audios/efeitos/jingles_NES09.ogg",
-    gameOver: "../audios/efeitos/gameOver.ogg",
-    click: "../audios/efeitos/tick_002.ogg",
-    ok: "../audios/efeitos/confirmation_002.ogg",
-    shoot: "../audios/efeitos/select_002.ogg",
-    winner: "../audios/efeitos/BossIntro.wav",
-    coin: "../audios/efeitos/somcoin.mp3"
+    screenInicial: "./src/audios/trilhaSonora/Juhani Junkala [Retro Game Music Pack] Title Screen.wav",
+    jump: "./src/audios/efeitos/drop_004.ogg",
+    colision: "./src/audios/efeitos/impactWood_medium_001.ogg",
+    hit: "./src/audios/efeitos/jingles_NES09.ogg",
+    gameOver: "./src/audios/efeitos/gameOver.ogg",
+    click: "./src/audios/efeitos/tick_002.ogg",
+    ok: "./src/audios/efeitos/confirmation_002.ogg",
+    shoot: ".src/audios/efeitos/select_002.ogg",
+    winner: "./src/audios/efeitos/BossIntro.wav",
+    coin: "./src/audios/efeitos/somcoin.mp3"
 };
 
 document.addEventListener("DOMContentLoaded", ()=>{
@@ -181,7 +181,7 @@ class Player {
             const firstLetters = key.substring(0, 4); //separa as palavras iniciais usadas no nome da pasta da animação.
             
             this.sprites[key].forEach((img, idx)=>{
-                img.src = `../assets/scoutPlat/${character}/${firstLetters}/${key}(${idx}).png`;
+                img.src = `./src/assets/scoutPlat/${character}/${firstLetters}/${key}(${idx}).png`;
             });
         })
 
@@ -410,7 +410,7 @@ class Enemy {
 
         // Carregar as imagens
         for (let i = 0; i < this.sprites.bola.length; i++) {
-            this.sprites.bola[i].src = `../assets/scoutPlat/bola/bola(${i}).png`;
+            this.sprites.bola[i].src = `./src/assets/scoutPlat/bola/bola(${i}).png`;
         }
         
         // Verificar se as imagens estão carregadas
@@ -517,7 +517,7 @@ class Projectile{
         this.lastTime = 0;
         this.sprites = [new Image(), new Image(), new Image()];
         for (let index = 0; index < this.sprites.length; index++) {
-            this.sprites[index].src = `../assets/scoutPlat/bola-tenis/bolatenis(${index}).png`;
+            this.sprites[index].src = `./src/assets/scoutPlat/bola-tenis/bolatenis(${index}).png`;
         }
     }
 
@@ -563,7 +563,7 @@ class Cloud {
         this.lastTime = 0;
         this.sprites = [new Image(), new Image(), new Image()];
         for (let index = 0; index < this.sprites.length; index++) {
-            this.sprites[index].src = `../assets/scoutPlat/clouds/cloud(${index}).png`;
+            this.sprites[index].src = `./src/assets/scoutPlat/clouds/cloud(${index}).png`;
         }
     }
 
@@ -604,7 +604,7 @@ class Flag {
         this.lastTime = 0;
         this.sprites = [new Image(), new Image(), new Image()];
         for (let index = 0; index < this.sprites.length; index++) {
-            this.sprites[index].src = `../assets/scoutPlat/flags/flags1(${index}).png`;
+            this.sprites[index].src = `./src/assets/scoutPlat/flags/flags1(${index}).png`;
         }
     }
 
@@ -634,7 +634,7 @@ class Tree {
         this.lastTime = 0;
         this.sprites = [new Image()];
         for (let index = 0; index < this.sprites.length; index++) {
-            this.sprites[index].src = `../assets/scoutPlat/arvores/arvore01.png`;
+            this.sprites[index].src = `./src/assets/scoutPlat/arvores/arvore01.png`;
         }
     }
 
@@ -663,7 +663,7 @@ class Item {
         this.lastTime = 0;
         this.sprites = [new Image(), new Image(), new Image(), new Image(), new Image()];
         for (let index = 0; index < this.sprites.length; index++) {
-            this.sprites[index].src = `../assets/scoutPlat/coin/coin(${index}).png`;
+            this.sprites[index].src = `./src/assets/scoutPlat/coin/coin(${index}).png`;
         }
     }
     draw(ctx, gridSize){
@@ -693,7 +693,7 @@ function Game(){
     
     let jumpForce = -4.5;
     let gravity = 15;
-    const damage = 0;
+    const damage = 3;
     
     let player = new Player(character, 2, 8, 'Player', false);
     let npcBP = new Player("bp", 8, 8, 'NPC');
