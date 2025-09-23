@@ -4,48 +4,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./src/css/home.css">
+    <link rel="stylesheet" href="src/css/home.css">
 </head>
 
 <body id="body">
-    <h1>Cleiton – Portfólio</h1>
-    <ul>
-        <li>
-            <a href="#sobre_mim">Sobre Mim</a>
-        </li>
-        <li>
-            <a href="#habilidades">Habilidades</a>
-        </li>
-        <li>
-            <a href="#projetos">Projetos</a>
-        </li>
-        <li>
-            <a href="#contato">Contatos</a>
-        </li>
-    </ul>
-    <h1 id="sobre_mim">Sobre Mim</h1>
-    <p>Um breve texto sobre você. </p>
-    <section id="habilidades">
-        <h2>Minhas Habilidades</h2>
+    <header>
+        <h1>Cleiton – Portfólio</h1>
+    </header>
+    <nav>
         <ul>
-            <li>HTML</li>
-            <li>CSS</li>
-            <li>JavaScript</li>
+            <li>
+                <a href="#sobre_mim">Sobre Mim</a>
+            </li>
+            <li>
+                <a href="#habilidades">Habilidades</a>
+            </li>
+            <li>
+                <a href="#projetos">Projetos</a>
+            </li>
+            <li>
+                <a href="#contato">Contatos</a>
+            </li>
         </ul>
-    </section>
+    </nav>
 
-    <section id="projetos">
-        <h2>Meus Projetos</h2>
-        <!-- Aqui entrarão os links para os jogos -->
-        <p>Projeto 1: Jogo da Kaa</p>
-        <p>Projeto 2: Scout Plat</p>
-    </section>
+    <h1 id="sobre_mim">Sobre Mim</h1>
+    <img src="https://github.com/CleitonTorres.png" />
+    <p>Um breve texto sobre você. </p>
+    <button id="saudacaoBtn">Diga Olá!</button>
+    <p id="saudacaoMensagem"></p>
 
-    <section id="contato">
-        <h2>Contato</h2>
-        <p>Informações de contato ou um formulário.</p>
-    </section>
+    <main>
+        <section id="habilidades">
+            <h2>Minhas Habilidades</h2>
+            <ul>
+                <li>HTML</li>
+                <li>CSS</li>
+                <li>JavaScript</li>
+            </ul>
+        </section>
 
+        <section id="projetos">
+            <h2>Meus Projetos</h2>
+            <a href="/jogoKaa.html">Projeto 1: Jogo da Kaa</a>
+            <br />
+            <a href="/scoutPlat.html">Projeto 2: Scout Plat</a>
+        </section>
+
+        <section id="contato">
+            <h2>Contato</h2>
+            <p>Informações de contato ou um formulário.</p>
+        </section>
+    </main>
+    <footer>
+        <h5>© 2025 Cleiton Torres Machado. Todos os direitos reservados.</h5>
+    </footer>
     <script src="./src/scripts/scripts.js"></script>
 </body>
 
