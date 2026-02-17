@@ -5,13 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="src/css/home.css">
+    <!-- link para os ícones do Google Material Symbols -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400;700" />
 </head>
 
 <body id="body">
     <header>
         <h1>Cleiton – Portfólio</h1>
+        <button id="menu-mobile">==</button>
     </header>
-    <nav>
+
+    <nav id="nav">
         <ul>
             <li>
                 <a href="#sobre_mim">Sobre Mim</a>
@@ -28,34 +32,84 @@
         </ul>
     </nav>
 
-    <h1 id="sobre_mim">Sobre Mim</h1>
-    <img src="https://github.com/CleitonTorres.png" />
-    <p>Um breve texto sobre você. </p>
-    <button id="saudacaoBtn">Diga Olá!</button>
-    <p id="saudacaoMensagem"></p>
+    <section id="sobre_mim">
+        <h1>Sobre Mim</h1>
+        <div class="conteinerProfile">
+            <img src="https://github.com/CleitonTorres.png" />
+            <p>Olá! Sou [Seu Nome], um entusiasta da programação web com paixão por criar soluções inovadoras
+                e
+                interativas. Estou sempre em busca de novos desafios e oportunidades para aprender e crescer. Meu
+                objetivo é
+                transformar ideias em realidade digital, combinando design intuitivo com funcionalidade robusta.
+            </p>
+        </div>
+        <button id="saudacaoBtn">Diga Olá!</button>
+        <p id="saudacaoMensagem"></p>
+    </section>
 
     <main>
         <section id="habilidades">
             <h2>Minhas Habilidades</h2>
             <ul>
-                <li>HTML</li>
-                <li>CSS</li>
-                <li>JavaScript</li>
+                <li>
+                    HTML
+                    <span class="material-symbols-outlined">
+                        format_h5
+                    </span>
+                </li>
+                <li>
+                    CSS
+                    <span class="material-symbols-outlined">
+                        css
+                    </span>
+                </li>
+                <li>
+                    JavaScript
+                    <span class="material-symbols-outlined">
+                        javascript
+                    </span>
+                </li>
             </ul>
         </section>
 
         <section id="projetos">
             <h2>Meus Projetos</h2>
-            <a href="/jogoKaa.html">Projeto 1: Jogo da Kaa</a>
-            <br />
-            <a href="/scoutPlat.html">Projeto 2: Scout Plat</a>
+            <div class="projetos-container">
+                <div class="projeto-card">
+                    <h3>Projeto 1: Jogo da Kaa</h3>
+                    <img src="src/assets/kaa/kaa-head-profile.png" alt="Screenshot do Projeto">
+                    <p>Um projeto HTML, CSS e Javascript.</p>
+                    <a href="/jogoKaa.html" target="_blank">Ver projeto</a>
+                    <a href="" target="_blank">Código no GitHub</a>
+                </div>
+                <br />
+                <div class="projeto-card">
+                    <h3>Projeto 2: Scout Plat</h3>
+                    <img src="src/assets/scoutPlat/maria/idle/idle(0).png" alt="Screenshot do Projeto">
+                    <p>Um projeto HTML, CSS e Javascript. Com simulação de física de colisão e gravidade.</p>
+                    <a href="/scoutPlat.html" target="_blank">Ver projeto</a>
+                    <a href="" target="_blank">Código no GitHub</a>
+                </div>
+            </div>
         </section>
 
         <section id="contato">
             <h2>Contato</h2>
-            <p>Informações de contato ou um formulário.</p>
+            <form action="mailto:seuemail@exemplo.com" method="post" enctype="text/plain">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" required>
+                <br />
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" name="email" required>
+                <br />
+                <label for="mensagem">Mensagem:</label>
+                <textarea id="mensagem" name="mensagem" rows="4" required></textarea>
+                <br />
+                <button type="submit">Enviar</button>
+            </form>
         </section>
     </main>
+
     <footer>
         <h5>© 2025 Cleiton Torres Machado. Todos os direitos reservados.</h5>
     </footer>
