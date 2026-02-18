@@ -1,17 +1,34 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./src/css/stylesJogoKaa.css">
     <title>Jogo da Kaa</title>
 </head>
+
 <body>
+    <div id="startScreen" class="game-screen">
+        <h2>Jogo da Kaa</h2>
+        <p>Use as setas do teclado para mover a cobrinha.</p>
+        <p>Coma a comida para crescer e fazer pontos.</p>
+        <p>Não bata em você mesmo!</p>
+        <button id="startGameButton">Iniciar Jogo</button>
+    </div>
+
+    <div id="gameOverScreen" class="game-screen" style="display: none;">
+        <h2>Game Over!</h2>
+        <p>Sua pontuação final: <span id="finalScore">0</span></p>
+        <button id="playAgainButton">Jogar Novamente</button>
+    </div>
+
     <div id="game-container">
         <p>Pontuação: <span id="score">0</span></p>
         <canvas id="gameCanvas" width="400" height="400"></canvas>
     </div>
-    
+
     <script src="./src/scripts/scriptsJogoKaa.js"></script>
 </body>
+
 </html>
