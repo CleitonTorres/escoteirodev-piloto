@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => { //isso garante que o códi
     const gridSize = 20;
     const tileCount = canvas.width / gridSize; //calcula quantos "tiles" (blocos) cabem na largura do canvas dividindo a largura total do canvas pelo tamanho de cada tile. Isso é usado para determinar a posição da cobra e da maçã no grid do jogo.
     const velocity = 100; //define a velocidade do jogo, que é o intervalo de tempo (em milissegundos) entre cada atualização do jogo. Quanto menor o valor, mais rápido o jogo será.
-    const eatSound = new Audio("/src/audios/efeitos/som eat.mp3"); //cria um novo objeto de áudio para o som de comer a maçã, usando o caminho especificado para o arquivo de áudio. Este som pode ser reproduzido quando a cobra come a maçã para fornecer feedback sonoro ao jogador.
+    const eatSound = new Audio("../src/audios/efeitos/som_eat.mp3"); //cria um novo objeto de áudio para o som de comer a maçã, usando o caminho especificado para o arquivo de áudio. Este som pode ser reproduzido quando a cobra come a maçã para fornecer feedback sonoro ao jogador.
 
     //variáveis de controle de tela.
     const startScreen = document.getElementById("startScreen");
