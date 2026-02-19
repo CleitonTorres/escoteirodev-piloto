@@ -20,12 +20,22 @@
         <source src="" type="audio/ogg">
     </audio>
 
+    <!-- tela de game over -->
+    <div id="gameOverScreen" class="game-screen" style="display: none;">
+        <h2>Game Over!</h2>
+        <p>Sua pontuação final: <span id="finalScore">0</span></p>
+        <button id="playAgainButton">Jogar Novamente</button>
+    </div>
+
     <!-- div da interface inicial de seleção do personagem. -->
     <div class="boxSelector" id="boxSelector">
         <!-- lista de rank de jogadores -->
         <div class="boxScores">
             <span>Lista de pontos</span>
-            <ol id="listPlayers"></ol>
+            <ol id="listPlayers">
+                <li>Cleitinho - Score: 10 - Char: Léo </li>
+                <li>Clara - Score: 15 - Char: Maria </li>
+            </ol>
         </div>
 
         <h1>Selecione seu personagem!</h1>

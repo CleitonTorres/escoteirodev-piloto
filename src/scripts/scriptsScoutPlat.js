@@ -18,6 +18,7 @@ const efeitos = {
     winner: "./src/audios/efeitos/BossIntro.wav",
     coin: "./src/audios/efeitos/somcoin.mp3"
 };
+
 //elemento de input onde o nome do jogador é digitado.
 const inputElement = document.getElementById("namePlayer");
 
@@ -30,7 +31,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     changeAudioSource(
         efeitos.screenInicial,
         true
-    )
+    );
 })
 
 //a função select espera receber um id, ou seja, o nome do personagem selecionado maria ou leo.
@@ -122,7 +123,7 @@ function renderPlayersList() {
     const playersList = document.getElementById("listPlayers");
 
     // Limpa a lista antes de renderizar (se necessário)
-    playersList.innerHTML = "";
+    // playersList.innerHTML = "";
 
     // Itera sobre a lista de jogadores e cria os <li>
     namesPlayers.sort((a, b) => a.score < b.score).forEach(player => {
@@ -694,6 +695,11 @@ function Game(){
     const tileCount = canvas.width / gridSize;
     const linhas = canvas.height / gridSize;
     
+    //variáveis de controle de tela.
+    const playAgainButton = document.getElementById("playAgainButton");
+    const gameOverScreen = document.getElementById("gameOverScreen");
+    const finalScoreDisplay = document.getElementById("finalScore");
+
     let isGameover = false;
     
     let jumpForce = -4.5;
@@ -804,16 +810,21 @@ function Game(){
         });
     }
 
+    //verifica se o player perdeu o jogo.
     function gameover(){
         if(player.hp <= 0){
+            showGameOverScreen();
             playEfeitos(efeitos.gameOver);
-            alert("Gameover!");
             
+            //limpa e esconde o canvas.
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             canvas.style.display = 'none';
             
+            // exibe o modal de seleção de personagem.
             const modal = document.getElementById("boxSelector");
             modal.classList.remove("hiddenModal");
+
+            //muda o estado para gameover para parar o loop.
             isGameover= true;
 
             //atualiza a lista de playes do quadro de records.
@@ -837,6 +848,17 @@ function Game(){
             //atualiza a lista de playes do quadro de records.
             setNamePlayer();
         }
+    }
+
+    // Função para mostrar a tela de game over.
+    function showGameOverScreen() {
+        finalScoreDisplay.textContent = currentPlayer.score;
+        gameOverScreen.style.display = "flex";
+    }
+
+    // Função para esconder a tela de game over.
+    function hideGameOverScreen() {
+        gameOverScreen.style.display = "none";
     }
 
     // Função para disparar um projétil
@@ -978,5 +1000,11 @@ function Game(){
 
     canvas.addEventListener("click", function (e) {
         shoot();
+    });
+
+    playAgainButton.addEventListener("click", () => {
+        // Esconde a tela de game over quando o jogador clica no botão de jogar novamente, 
+        // permitindo que uma nova partida comece.
+        hideGameOverScreen(); 
     });
 }
