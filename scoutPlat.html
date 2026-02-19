@@ -1,65 +1,56 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./src/css/stylesScoutPlat.css">
     <title>Aventura Escoteira</title>
 </head>
+
 <body>
-    <audio 
-        controls 
-        id="AudioPlayer"
-    >
-        <source 
-            src="" 
-            type="audio/ogg"
-        >
+    <!-- player para controle da trilha sonora -->
+    <audio controls id="AudioPlayer">
+        <source src="" type="audio/ogg">
         Seu navegador não suporta esse elemento.
-    </audio> 
+    </audio>
+
+    <!-- player para controle dos efeitos sonoros -->
     <audio id="efeitos">
         <source src="" type="audio/ogg">
     </audio>
 
+    <!-- div da interface inicial de seleção do personagem. -->
     <div class="boxSelector" id="boxSelector">
+        <!-- lista de rank de jogadores -->
         <div class="boxScores">
             <span>Lista de pontos</span>
             <ol id="listPlayers"></ol>
         </div>
+
         <h1>Selecione seu personagem!</h1>
         <h4 id="nameCharacter"></h4>
+
+        <!-- personagens possíveis de serem selecionados. -->
         <div class="selector">
-            <img 
-                src="./src/assets/scoutPlat/maria/idle/idle(0).png" 
-                alt=""
-                onclick="Select('maria')"
-                id="maria"
-            >
-            <img 
-                src="./src/assets/scoutPlat/leo/idle/idle(0).png" 
-                alt=""
-                onclick="Select('leo')"
-                id="leo"
-            >
+            <img src="./src/assets/scoutPlat/maria/idle/idle(0).png" alt="" onclick="Select('maria')" id="maria">
+            <img src="./src/assets/scoutPlat/leo/idle/idle(0).png" alt="" onclick="Select('leo')" id="leo">
         </div>
-        <input 
-            type="text" 
-            name="namePlayer" 
-            id="namePlayer"
-            placeholder="Seu nome"
-            min="0" 
-            max="10"
-            class="input"
-        />
-        <button onclick="Start()">Start</button>
+        <input type="text" name="namePlayer" id="namePlayer" placeholder="Seu nome" min="0" max="10" class="input" />
+        <button onclick="start()">Start</button>
     </div>
+
+    <!-- div da interface inicial de seleção do personagem. -->
     <div id="game-container">
+        <!-- display para exibir dados do jog score, velocidade, gravidade etc. -->
         <div class="boxHeader" id="boxHeader">
             <p id="logStatus"></p>
             <p id="log"></p>
         </div>
+        <!-- display do jogo -->
         <canvas id="gameCanvas" width="960" height="640"></canvas>
-    </div>    
+    </div>
     <script src="./src/scripts/scriptsScoutPlat.js"></script>
 </body>
+
 </html>

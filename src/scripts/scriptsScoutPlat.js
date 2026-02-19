@@ -1,10 +1,11 @@
-let character= "";
-let speed = 3;
-let audioPlayer= null;
-let audioEfeitos = null;
-let currentPlayer = {name: '', score: 0, character: ''};
-let namesPlayers = [];
+let character= ""; //nome do personagem que o jogador vai controlar.
+let speed = 3; //velocidade de movimento do personagem.
+let audioPlayer= null; //elemento de áudio que controla a trilha sonora do jogo.
+let audioEfeitos = null; //elemento de áudio que controla os efeitos sonoros.
+let currentPlayer = {name: '', score: 0, character: ''}; //objeto que armazena as informações do jogador atual.
+let namesPlayers = []; //lista de jogadores no ranking.
 
+// objeto contendo os endereços de todos os efeitos sonoros que vamos usar no jogo.
 const efeitos = {
     screenInicial: "./src/audios/trilhaSonora/Juhani Junkala [Retro Game Music Pack] Title Screen.wav",
     jump: "./src/audios/efeitos/drop_004.ogg",
@@ -17,6 +18,8 @@ const efeitos = {
     winner: "./src/audios/efeitos/BossIntro.wav",
     coin: "./src/audios/efeitos/somcoin.mp3"
 };
+//elemento de input onde o nome do jogador é digitado.
+const inputElement = document.getElementById("namePlayer");
 
 document.addEventListener("DOMContentLoaded", ()=>{
     // Acessa o elemento <audio>
@@ -30,14 +33,15 @@ document.addEventListener("DOMContentLoaded", ()=>{
     )
 })
 
+//a função select espera receber um id, ou seja, o nome do personagem selecionado maria ou leo.
 function Select(id){
-    const img1 = document.getElementById('maria');
-    const img2 = document.getElementById("leo");
+    const img1 = document.getElementById('maria'); //captura o elemento que tem id maria.
+    const img2 = document.getElementById("leo"); //captura o elemento que tem id leo.
 
-    playEfeitos(efeitos.click);
+    playEfeitos(efeitos.click); //executa o efeito sonoro de click.
 
-    if(id === 'maria'){
-        img1.classList.toggle("selected");
+    if(id === 'maria'){ 
+        img1.classList.toggle("selected"); //alterna entre os estilos de css que configuramos. Incluindo ou removendo.
         img2.classList.remove("selected");
     }else{
         img2.classList.toggle("selected");
@@ -48,6 +52,7 @@ function Select(id){
     setCharacter(id)
 }
 
+//controla a exibição do personagem escolhido na UI (interface do usuário).
 function setCharacter(value){
     if(character === value){
         character= "";
@@ -57,33 +62,31 @@ function setCharacter(value){
     document.getElementById('nameCharacter').textContent = value ? "Você selecionou " + value[0].toUpperCase() + value.slice(1) : "";
 }
 
-
-const inputElement = document.getElementById("namePlayer");
+//listener que ouve o evento de input do elemento que capturamos como inputElement.
+inputElement.addEventListener('input',()=>{
+    handleNamePlayer(); // ao ocorrer o evento de input ele dispara o handleNamePlayer que recebe os dados de texto e seta na variável currentePlayer.
+});
 function handleNamePlayer(){
     currentPlayer = {
         id: namesPlayers.length + 1,
-        name: inputElement.value,
+        name: inputElement.value, //pega o valor do input (texto digitado pelo jogador). 
         score: 0,
         character: character
     }
 }
-inputElement.addEventListener('input',()=>{
-    handleNamePlayer();
-});
 
-
-function Start(){
+//fecha o modal com a seleção de personagens e inicia o jogo.
+function start(){
     const modal = document.getElementById("boxSelector");
     inputElement.value= ''; //limpa o valor do input.
 
-    if(character && currentPlayer.name !== ""){
+    if(character && currentPlayer.name !== ""){ //se o nome do jogador foi preenchido segue o código normalmente. Isso evita que o jogo inicie sem um jogador identificado.
         modal.classList.add("hiddenModal");
         playEfeitos(efeitos.ok)
         Game();
     }else{
         alert("Falta selecionar um personagem ou fornecer seu nome de player!");
-    }
-    
+    }    
 }
 
 //adiciona o currentPlayer a lista de player ao final da partida.
@@ -137,7 +140,7 @@ function changeAudioSource(newSource, loop=false) {
     audioPlayer.loop = loop
 }
 
-// Para tocar o som de pulo
+// Para tocar o sons de efeitos como pulo, click, game over etc.
 function playEfeitos(newSource, volume=0.2) {
     audioEfeitos.currentTime = 0; // Recomeça o som caso esteja tocando
     audioEfeitos.src = newSource;
@@ -148,7 +151,7 @@ function playEfeitos(newSource, volume=0.2) {
 // Classe para representar o player
 class Player {
     constructor(character, initialX, initialY, type="NPC" || "Player", showHitBox) {
-        this.character = character;
+        this.character = character; //nome do personagem.
         this.hp = 100;
         this.x = initialX;
         this.y = initialY;
@@ -200,6 +203,7 @@ class Player {
         });
     }
 
+    //checa se o player está tocando no chão ou em uma plataforma.
     isOnfloorCheck(floor, gridSize){
         const playerBottom = (this.y * gridSize) + this.height; // Posição do "pé" do jogador
         const leftPlayer = this.x * gridSize;
@@ -219,6 +223,7 @@ class Player {
         return isAboveFloor && isWithinHorizontalBounds;
     }
 
+    //atualiza informações sobre posição, velocidade, estado caindo, pulando etc.
     update(currentTime, gravity, speed, floors, tileCount, gridSize, linhas) {
         const deltaTime = (currentTime - this.lastTime) / 2000; // Convertendo para segundos
         this.lastTime = currentTime;
@@ -693,10 +698,12 @@ function Game(){
     
     let jumpForce = -4.5;
     let gravity = 15;
-    const damage = 3;
+    const damage = 10;
     
+    //aqui estamos instanciando (criando uma cópia) da classe Player que Apartir desse momento se tornar um objeto 
+    //chamado player e está armazenado em uma variável let para podermos acessar e alterar quando for necessário.
     let player = new Player(character, 2, 8, 'Player', false);
-    let npcBP = new Player("bp", 8, 8, 'NPC');
+    let npcBP = new Player("bp", 8, 8, 'NPC', false);
     
     const nuvens = [
         new Cloud(14, 0.1, gridSize, gridSize, 0.5),
@@ -798,7 +805,7 @@ function Game(){
     }
 
     function gameover(){
-        if(player.hp === 0){
+        if(player.hp <= 0){
             playEfeitos(efeitos.gameOver);
             alert("Gameover!");
             
@@ -860,7 +867,7 @@ function Game(){
     }
 
     function loop(currentTime) {
-        if(isGameover) return;
+        if(isGameover) return; //se deu game over para o loop.
 
         drawGrounds();            
 
