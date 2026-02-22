@@ -103,6 +103,7 @@ body{
     font-weight: 700;
     text-align: center;
 }
+/* seletor pelo ID do canvas, definindo a cor de fundo como aqua. */
 #AudioPlayer{
     position: fixed;
     right: 0;
