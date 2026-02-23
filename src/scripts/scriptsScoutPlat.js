@@ -459,29 +459,26 @@ class Enemy {
   }
 
   // Verifica colisão com o projetil do player.
-  isCollision(collide, gridSize, ctx) {
-    if (collide === null) return;
+  isCollision(collide) {
+    if (collide === null) return false; //collide é o objeto com o qual queremos verificar a colisão. Se ele for nulo, não tem como verificar a colisão, então retornamos false.
 
-    const toleranceX = this.width / 3;
-    const toleranceY = this.height / 3;
+    const toleranceX = this.width / 3; //tolerância para a colisão no eixo x. Isso deixa a colisão mais "justa" e evita que o player colida quando estiver quase tocando o objeto.
+    const toleranceY = this.height / 3; //tolerância para a colisão no eixo y. Isso deixa a colisão mais "justa" e evita que o player colida quando estiver quase tocando o objeto.
 
-    const playerX1 = this.x * gridSize + toleranceX;
-    const playerX2 = this.x * gridSize + this.width - toleranceX;
-    const playerY1 = this.y * gridSize + toleranceY;
-    const playerY2 = this.y * gridSize + this.height - toleranceY;
-
-    // Desenha a hitbox no canvas
-    if (this.showHitBox)
-      this.drawHitBox(ctx, playerX1, playerY1, playerX2, playerY2);
+    const enemyX1 = this.x * this.gridSize + toleranceX; //limite esquerdo do inimigo com a tolerância aplicada.
+    const enemyX2 = this.x * this.gridSize + this.width - toleranceX; //limite direito do inimigo com a tolerância aplicada.
+    const enemyY1 = this.y * this.gridSize + toleranceY; //limite superior do inimigo com a tolerância aplicada.
+    const enemyY2 = this.y * this.gridSize + this.height - toleranceY; //limite inferior do inimigo com a tolerância aplicada.
 
     var colidiuX = false;
     var colidiuY = false;
 
     //verifica a colisão para cada pixel do objeto em X.
     for (let index = 0; index <= collide.width; index++) {
-      const currentPixelX = collide.x * gridSize + index;
+      const currentPixelX = collide.x * this.gridSize + index;
 
-      if (currentPixelX >= playerX1 && currentPixelX <= playerX2) {
+      //sobrepõe a hitbox do inimigo com a hitbox do projétil para verificar se houve colisão.
+      if (currentPixelX >= enemyX1 && currentPixelX <= enemyX2) {
         colidiuX = true;
         break;
       }
@@ -489,14 +486,16 @@ class Enemy {
 
     //verifica a colisão para cada pixel do objeto em Y.
     for (let index = 0; index <= collide.height; index++) {
-      const currentPixelY = collide.y * gridSize + index;
+      const currentPixelY = collide.y * this.gridSize + index;
 
-      if (currentPixelY >= playerY1 && currentPixelY <= playerY2) {
+      //sobrepõe a hitbox do inimigo com a hitbox do projétil para verificar se houve colisão.
+      if (currentPixelY >= enemyY1 && currentPixelY <= enemyY2) {
         colidiuY = true;
         break;
       }
     }
 
+    // Só retorna true se as duas condições forem verdadeiras, ou seja, se houve colisão tanto no eixo X quanto no eixo Y.
     return colidiuY && colidiuX;
   }
 }
@@ -504,19 +503,23 @@ class Enemy {
 // Classe para representar um projétil
 class Projectile {
   constructor(x, y, direction, canvas) {
-    this.canvas = canvas;
-    this.x = x;
-    this.y = y;
-    this.projectileSpeed = 0.1;
+    this.canvas = canvas; //referência ao canvas para verificar os limites da tela.
+    this.x = x; //posição x inicial do projétil, geralmente a posição do player.
+    this.y = y; //posição y inicial do projétil, geralmente a posição do player.
+    this.projectileSpeed = 0.1; //velocidade do projétil. Você pode ajustar esse valor para deixar o projétil mais rápido ou mais lento.
     this.direction = direction; // false para direita, true para esquerda
     this.markedForDeletion = false; // Marca o projétil para remoção quando sair da tela
-    this.width = 20;
-    this.height = 20;
+    this.width = 20; //largura do projétil. Você pode ajustar esse valor para deixar o projétil maior ou menor.
+    this.height = 20; //altura do projétil. Você pode ajustar esse valor para deixar o projétil maior ou menor.
 
-    this.currentFrame = 0;
-    this.animationFrame = 0;
-    this.lastTime = 0;
+    this.currentFrame = 0; //guarda a frame atual da animação do projétil.
+    this.animationFrame = 0; //velocidade da animação do projétil. O tempo que a animação leva para trocar entre sprites.
+    this.lastTime = 0; //variável usada para calcular a velocidade do loop da animação do projétil.
+    
+    // Prepara os sprites do projétil (bola de tênis)
     this.sprites = [new Image(), new Image(), new Image()];
+    
+    // Carregar as imagens dos projeteis
     for (let index = 0; index < this.sprites.length; index++) {
       this.sprites[index].src =
         `./src/assets/scoutPlat/bola-tenis/bolatenis(${index}).png`;
@@ -526,9 +529,9 @@ class Projectile {
   // Atualiza a posição do projétil
   update(gridSize) {
     if (this.direction) {
-      this.x -= this.projectileSpeed;
+      this.x -= this.projectileSpeed; // Se a direção for true, o projétil se move para a esquerda
     } else {
-      this.x += this.projectileSpeed;
+      this.x += this.projectileSpeed; // Se a direção for false, o projétil se move para a direita
     }
 
     // Se o projétil sair da tela, marque-o para remoção
@@ -545,17 +548,22 @@ class Projectile {
   // Desenha o projétil no canvas
   draw(ctx, gridSize) {
     ctx.drawImage(
-      this.sprites[this.currentFrame],
-      this.x * gridSize,
-      this.y * gridSize,
-      this.width,
-      this.height,
+      this.sprites[this.currentFrame], // Desenha a animação do projétil
+      this.x * gridSize, // posição x do projétil
+      this.y * gridSize, // posição y do projétil
+      this.width, // largura do projétil
+      this.height, // tamanho do projétil
     );
 
+    // Atualiza os frames da animação do projétil
+    // A cada 5 frames, avança para o próximo frame da animação
+    // Altere para 10 ajustar a velocidade da animação do projétil
     if (this.animationFrame % 5 === 0) {
-      // Altere 10 para ajustar a velocidade da animação
-      this.currentFrame = (this.currentFrame + 1) % this.sprites.length;
+      // Avança para o próximo frame da animação, voltando ao início quando chegar ao final 
+      this.currentFrame = (this.currentFrame + 1) % this.sprites.length; 
     }
+
+    // Contador geral usado para controlar o tempo da animação do projétil
     this.animationFrame++;
   }
 }
@@ -1028,7 +1036,7 @@ function game() {
     enemies.push(new Enemy(canvas, gridSize));
   }
 
-  // Criação do array de projéteis
+  //array para armazenar os projéteis disparados pelo player.
   const projectiles = [];  
 
   function drawBackground(x, y, width, height, color) {
@@ -1040,16 +1048,36 @@ function game() {
   function draw() {
     drawBackground(0, 8.5, canvas.width, gridSize / 2, "green");
 
-    for (const floor of floors) {
-      const newFloor = new Floor(floor); //criamos um novo objeto do tipo Floor para cada item do array de chão.
-      newFloor.draw(ctx, gridSize); //chamamos a função draw do objeto para desenhar a plataforma no canvas.
-    }
+    //aqui estamos usando o método forEach para percorrer a lista de plataformas (floors) e desenhar cada uma delas no canvas usando o método draw da classe Floor.
+    floors.forEach(floor => {
+      const newFloor = new Floor(floor);
+      newFloor.draw(ctx, gridSize)
+    });
+
+    //desenha os itens coletáveis (moedas).
+    itens.forEach(item => {
+      item.draw(ctx, gridSize);
+    });
 
     //desenha as as bolas (inimigos).
     enemies.forEach((enemy) => {
       enemy.draw(ctx, gridSize);
     });
 
+    // desenha projéteis, removendo os que estão fora da tela
+    projectiles.forEach((projectile, index) => {
+      projectile.update(gridSize);
+      if (projectile.markedForDeletion) {
+        projectiles.splice(index, 1); // Remove o projétil do array
+      } else {
+        projectile.draw(ctx, gridSize); // Desenha o projétil apenas se ele não estiver marcado para remoção
+      }
+    });
+
+    //atualiza score e outros dados do jogador no canto superior esquerdo do canvas.
+    console();
+
+    //desenha os projeteis disparados pelo jogador.
     projectiles.forEach((projectile) => {
       projectile.draw(ctx, gridSize);
     });
@@ -1066,16 +1094,21 @@ function game() {
 
   //função para atualizar o estado do jogo, como a posição do player, inimigos, projéteis e verificar colisões.
   function update(currentTime) {
-    //atualiza as informações relativas ao player.
-    player.update(
-      currentTime, //essa variável vem do requestAnimationFrame() e nos repassamos ela para o update.
-      gravity, // força da gravidade.
-      speed, // velocidade do personagem.
-      floors, // plataformas.
-      tileCount, // quantidade de tiles no canvas.
-      gridSize, // tamanho do grid.
-      linhas, // quantidade de linhas do canvas.
-    );
+    //verifica se o player colidiu com algum item coletável (moeda).
+    itens.forEach((moeda) => {
+      if (player.isCollisionPlayer(moeda, ctx)) {
+        //toca o efeito sonoro de coleta de moeda.
+        playEfeitos(efeitos.coin);
+
+        // aqui estamos atualizando o score do jogador, criando um novo objeto com as mesmas propriedades 
+        // do currentPlayer e atualizando apenas a propriedade score, somando 1 ponto para cada moeda coletada.
+        currentPlayer = { ...currentPlayer, score: currentPlayer.score + 1 };
+
+        // removemos a moeda do cenário, filtrando o array de itens para criar um novo array que inclui 
+        // apenas os itens que não são a moeda coletada. Dessa forma, a moeda coletada é removida do array e não será mais desenhada no canvas.
+        itens = itens.filter((item) => item != moeda); //remove o item do array.
+      }
+    });
 
     // Atualiza cada inimigo
     enemies.forEach((enemy) => {
@@ -1083,7 +1116,7 @@ function game() {
       
       // Verifica colisão com os projeteis no inimigo.
       projectiles.forEach((projectile) => {
-        if (enemy.isCollision(projectile, gridSize, ctx)) {
+        if (enemy.isCollision(projectile)) {
           // Ajustar a velocidade do inimigo na direção do projétil
           if (projectile.direction) {
             // Projétil disparado para a esquerda
@@ -1106,6 +1139,55 @@ function game() {
         enemy.y = 1; //reinicia a posição do inimigo de cima para baixo no eixo Y.
       }
     });
+
+    // atualiza o array de projéteis, removendo os que estão fora da tela
+    projectiles.forEach((projectile, index) => {
+      projectile.update(gridSize);
+      if (projectile.markedForDeletion) {
+        projectiles.splice(index, 1); // Remove o projétil do array
+      }
+    });
+
+    //atualiza as informações relativas ao player.
+    player.update(
+      currentTime, //essa variável vem do requestAnimationFrame() e nos repassamos ela para o update.
+      gravity, // força da gravidade.
+      speed, // velocidade do personagem.
+      floors, // plataformas.
+      tileCount, // quantidade de tiles no canvas.
+      gridSize, // tamanho do grid.
+      linhas, // quantidade de linhas do canvas.
+    );    
+  }
+
+  // Função para lidar com o dano ao jogador.
+  function getHit() {
+    player.hp = player.hp - damage;
+    playEfeitos(efeitos.hit, 0.1);
+  }
+
+  // Função para atualizar o console de informações do jogador.
+  function console() {
+    //pega o elemento HTML onde as informações do jogador serão exibidas.
+    const logStatus = document.getElementById("logStatus");
+
+    //atualiza o conteúdo do elemento com as informações do jogador atual, como nome, score e HP.
+    logStatus.innerHTML = `
+            Player: ${currentPlayer.name}<br/>
+            Score: ${currentPlayer.score || 0}<br/>
+            HP: ${player.hp}<br/>
+        `;
+  }
+
+  // Função para disparar um projétil
+  function shoot() {
+    // Adiciona um projétil a partir do centro do jogador
+    projectiles.push(
+      new Projectile(player.x + 0.5, player.y + 0.5, player.direction, canvas),
+    );
+
+    // Toca o efeito sonoro de disparo
+    playEfeitos(efeitos.shoot);
   }
 
   function drawForegrounds() {
@@ -1168,24 +1250,6 @@ function game() {
     gameOverScreen.style.display = "none";
   }
 
-  // Função para disparar um projétil
-  function shoot() {
-    // Adiciona um projétil a partir do centro do jogador
-    projectiles.push(
-      new Projectile(player.x + 0.5, player.y + 0.5, player.direction, canvas),
-    );
-    playEfeitos(efeitos.shoot);
-  }
-
-  function Console() {
-    const logStatus = document.getElementById("logStatus");
-
-    logStatus.innerHTML = `
-            Player: ${currentPlayer.name}<br/>
-            Score: ${currentPlayer.score || 0}<br/>
-            HP: ${player.hp}<br/>
-        `;
-  }
   // ao final do jogo adiciona o currentPlayer a lista de player ao final da partida.
   function setNamePlayer() {
     const verify = namesPlayers.find((item) => item.name === currentPlayer.name);
@@ -1232,12 +1296,6 @@ function game() {
       });
   }
 
-  // Função para lidar com o dano ao jogador.
-  function getHit() {
-    player.hp = player.hp - damage;
-    playEfeitos(efeitos.hit, 0.1);
-  }
-
   function loop(currentTime) {
     if (isGameover) return; //se deu game over para o loop.
 
@@ -1247,33 +1305,11 @@ function game() {
     //desenha o cenário, player, inimigos e itens.
     draw();
 
-    itens.forEach((i) => {
-      if (player.isCollisionPlayer(i, gridSize, ctx)) {
-        //se colidiu não desenha o item na tela e remove ele do array.
-        playEfeitos(efeitos.coin);
-        currentPlayer = { ...currentPlayer, score: currentPlayer.score + 1 };
-        itens = itens.filter((item) => item != i); //remove o item do array.
-      } else {
-        i.draw(ctx, gridSize);
-      }
-    });
-
     //atualiza a posição dos inimigos e verifica colisões.
     update(currentTime);
 
     //verifica se o player chegou no endpoint.
     winner();
-
-    // Desenha os projéteis
-    // Atualiza e desenha projéteis, removendo os que estão fora da tela
-    projectiles.forEach((projectile, index) => {
-      projectile.update(gridSize);
-      if (projectile.markedForDeletion) {
-        projectiles.splice(index, 1); // Remove o projétil do array
-      } else {
-        projectile.draw(ctx, gridSize);
-      }
-    });
 
     for (let index = 0; index < nuvens.length; index++) {
       nuvens[index].draw(ctx, gridSize);
@@ -1283,8 +1319,6 @@ function game() {
     drawForegrounds();
 
     gameover();
-
-    Console();
 
     requestAnimationFrame(loop);
   }
@@ -1309,7 +1343,7 @@ function game() {
       player.direction = false;
     }
 
-    //se teclarmos enter estamos estamos chamando o shoot() que diz ao parsonagem para disparar uma bolinha.
+    //se teclarmos enter estamos estamos chamando o shoot() que diz ao personagem para disparar uma bolinha.
     if (press === "Enter") {
       shoot();
     }
@@ -1328,6 +1362,7 @@ function game() {
     }
   });
 
+  //adiciona um listener para o evento de clique no canvas, que chama a função shoot() para disparar um projétil quando o jogador clica na tela.
   canvas.addEventListener("click", function (e) {
     shoot();
   });
