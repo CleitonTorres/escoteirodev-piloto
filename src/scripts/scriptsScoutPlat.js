@@ -614,34 +614,42 @@ class Cloud {
   }
 }
 
-//classe da nuvem
+//classe da Bandeirola (flag) que fica tremulando no topo do mastro.
 class Flag {
-  constructor(x, y, width, height) {
+  constructor(x, y, width, height, gridSize) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
-    this.currentFrame = 0;
-    this.animationFrame = 0;
-    this.lastTime = 0;
+    this.gridSize = gridSize;
+
+    this.currentFrame = 0; //guarda a frame atual da animação da bandeira.
+    this.animationFrame = 0; //velocidade da animação da bandeira. O tempo que a animação leva para trocar entre sprites.
+    this.lastTime = 0; //variável usada para calcular a velocidade do loop da animação da bandeira.
+    
+    // Prepara os sprites da bandeira
     this.sprites = [new Image(), new Image(), new Image()];
+
+    // Carregar as imagens da bandeira
     for (let index = 0; index < this.sprites.length; index++) {
       this.sprites[index].src =
         `./src/assets/scoutPlat/flags/flags1(${index}).png`;
     }
   }
 
-  draw(ctx, gridSize) {
+  //função para desenhar a bandeira no canvas.
+  draw(ctx) {
     ctx.drawImage(
       this.sprites[this.currentFrame],
-      this.x * gridSize,
-      this.y * gridSize,
+      this.x * this.gridSize,
+      this.y * this.gridSize,
       this.width,
       this.height,
     );
 
+    // Altere o 20 para ajustar a velocidade da animação
     if (this.animationFrame % 20 === 0) {
-      // Altere 10 para ajustar a velocidade da animação
+      // Avança para o próximo frame da animação, voltando ao início quando chegar ao final
       this.currentFrame = (this.currentFrame + 1) % this.sprites.length;
     }
     this.animationFrame++;
@@ -813,12 +821,14 @@ function game() {
 
   //variáveis de controle de tela.
   const playAgainButton = document.getElementById("playAgainButton");
-  const gameOverScreen = document.getElementById("gameOverScreen");
+  const gameScreen = document.getElementById("game-screen");
+  const gameScreenTitle = document.getElementById("game-screen-title");
   const finalScoreDisplay = document.getElementById("finalScore");
+
 
   //variáveis de estado e física.
   let isGameover = false; //estado de game over.
-  let speed = 2; //velocidade de movimento do personagem.
+  let speed = 3; //velocidade de movimento do personagem.
   let jumpForce = -5; //força do pulo.
   let gravity = 15; // força da gravidade sobre o personagem.
   const damage = 10; // dano que os inimigos aplicam no personagem.
@@ -1004,20 +1014,6 @@ function game() {
     });
   }
 
-  //nuvens
-  const nuvens = [
-    new Cloud(14, 0.1, gridSize, gridSize, 0.5),
-    new Cloud(15, 0.5, gridSize, gridSize, 0.3),
-    new Cloud(15, 0.1, gridSize, gridSize, 0.4),
-  ];
-
-  //bandeira
-  const flag01 = new Flag(7, 0, gridSize, gridSize);
-
-  //arvores
-  const trees = [new Tree(2, 7.8, gridSize + 10, gridSize + 20)];
-  const treesForeground = [new Tree(9, 7.2, gridSize + 10, gridSize * 2)];
-
   var itens = [
     new Item(5, 6.5, gridSize / 2, gridSize / 2), //instanciação de itens usando a classe Item, cada item tem uma posição (x, y) e um tamanho (width, height).
     new Item(8, 3.5, gridSize / 2, gridSize / 2),
@@ -1038,6 +1034,22 @@ function game() {
 
   //array para armazenar os projéteis disparados pelo player.
   const projectiles = [];  
+
+  //bandeira
+  // você pode definir uma posição personalizada para a bandeirola.
+  const flag01 = new Flag(7, 0, gridSize, gridSize, gridSize);
+  
+  //nuvens
+  const nuvens = [
+    new Cloud(14, 0.1, gridSize, gridSize, 0.5),
+    new Cloud(15, 0.5, gridSize, gridSize, 0.3),
+    new Cloud(15, 0.1, gridSize, gridSize, 0.4),
+  ];
+
+  //arvores
+  const trees = [new Tree(2, 7.8, gridSize + 10, gridSize + 20)];
+  const treesForeground = [new Tree(9, 7.2, gridSize + 10, gridSize * 2)];
+
 
   function drawBackground(x, y, width, height, color) {
     ctx.fillStyle = color;
@@ -1083,7 +1095,7 @@ function game() {
     });
 
     npcBP.draw(ctx, gridSize);
-    flag01.draw(ctx, gridSize);
+    flag01.draw(ctx);
 
     trees.forEach((tree) => {
       tree.draw(ctx, gridSize);
@@ -1198,15 +1210,44 @@ function game() {
 
   //verifica se o player perdeu o jogo.
   function gameover() {
+    //se o HP do player for menor ou igual a 0, significa que ele perdeu o jogo.
     if (player.hp <= 0) {
-      showGameOverScreen();
-      playEfeitos(efeitos.gameOver);
+      showGameScreen("Game Over"); //exibe a tela de game over.
+      playEfeitos(efeitos.gameOver); //toca o efeito sonoro de game over.
 
       //limpa e esconde o canvas.
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       canvas.style.display = "none";
 
       // exibe o modal de seleção de personagem.
+      const modal = document.getElementById("boxSelector");
+      modal.classList.remove("hiddenModal"); //remove a classe que esconde o modal, tornando-o visível para o jogador.
+
+      //muda o estado para gameover para parar o loop.
+      isGameover = true;
+
+      //atualiza a lista de playes do quadro de records.
+      setNamePlayer();
+    }
+  }
+
+  function winner() {
+    //verifica se o player chegou na bandeira (endpoint) para vencer a fase. A condição de vitória é que o player esteja dentro da área da bandeira (flag01) e esteja no chão (yVelocity >= 0).
+    const chegou =
+      flag01.x <= player.x &&
+      flag01.x + flag01.width >= player.x &&
+      flag01.y === player.y;
+    
+    if (chegou && player.yVelocity >= 0) {//se o player chegou na bandeira e está no chão, ele vence a fase.
+      playEfeitos(efeitos.winner); //toca o efeito sonoro de vitória.
+
+      //atualiza o score do jogador, somando 10 pontos para a vitória.
+      showGameScreen("Parabéns, você completou a fase!");
+
+      //limpa e esconde o canvas.
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.style.display = "none";
+
       const modal = document.getElementById("boxSelector");
       modal.classList.remove("hiddenModal");
 
@@ -1218,50 +1259,32 @@ function game() {
     }
   }
 
-  function winner() {
-    const chegou =
-      flag01.x <= player.x &&
-      flag01.x + flag01.width >= player.x &&
-      flag01.y === player.y;
-    if (chegou && player.yVelocity >= 0) {
-      playEfeitos(efeitos.winner);
-
-      alert("Parabéns! Você completou a fase!");
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      canvas.style.display = "none";
-
-      const modal = document.getElementById("boxSelector");
-      modal.classList.remove("hiddenModal");
-      isGameover = true;
-      //atualiza a lista de playes do quadro de records.
-      setNamePlayer();
-    }
-  }
-
   // Função para mostrar a tela de game over.
-  function showGameOverScreen() {
-    finalScoreDisplay.textContent = currentPlayer.score;
-    gameOverScreen.style.display = "flex";
+  function showGameScreen(title = "") {
+    gameScreenTitle.textContent = title; //atualiza o título da tela de game screen com o título fornecido.
+    finalScoreDisplay.textContent = currentPlayer.score; //atualiza o display de score final com a pontuação do jogador atual.
+    gameScreen.style.display = "flex"; //altera o estilo de exibição da tela de game screen para "flex", tornando-a visível na tela. A tela de game over deve estar configurada com display: none no CSS para que ela fique oculta inicialmente e só seja exibida quando essa função for chamada.
   }
 
-  // Função para esconder a tela de game over.
-  function hideGameOverScreen() {
-    gameOverScreen.style.display = "none";
+  // Função para esconder a tela de game screen.
+  function hideGameScreen() {
+    gameScreen.style.display = "none"; //altera o estilo de exibição da tela de game over para "none", tornando-a invisível na tela.
   }
 
   // ao final do jogo adiciona o currentPlayer a lista de player ao final da partida.
   function setNamePlayer() {
+    //verifica se o jogador atual já existe na lista de jogadores (namesPlayers) comparando o nome do jogador atual com os nomes dos jogadores na lista. Se encontrar um jogador com o mesmo nome, a variável verify receberá esse jogador, caso contrário, receberá undefined.
     const verify = namesPlayers.find((item) => item.name === currentPlayer.name);
 
     if (!verify) {
+      // se o jogador não existir na lista, adiciona o jogador atual à lista de jogadores (namesPlayers) usando o método push. O objeto do jogador é criado com as mesmas propriedades do currentPlayer, mas a propriedade character é formatada para ter a primeira letra maiúscula e o restante em minúscula.
       namesPlayers.push({
         ...currentPlayer,
         character:
           currentPlayer.character[0].toUpperCase() +
           currentPlayer.character.slice(1),
       });
-    } else {
+    } else { // se o jogador já existir na lista, atualiza as informações do jogador existente na lista (namesPlayers) usando o método map para criar um novo array. Para cada item na lista de jogadores, verifica se o nome do item é igual ao nome do jogador atual. Se for igual, retorna um novo objeto com as mesmas propriedades do currentPlayer, mas com a propriedade character formatada para ter a primeira letra maiúscula e o restante em minúscula. Se não for igual, retorna o item original sem alterações.
       namesPlayers = namesPlayers.map((item) => {
         if (item.name === currentPlayer.name) {
           return {
@@ -1275,12 +1298,15 @@ function game() {
         }
       });
     }
+
+    //limpa a variável currentPlayer para preparar para uma nova partida, atribuindo um objeto vazio com as mesmas propriedades (name, score e character) mas sem valores. Isso é importante para garantir que as informações do jogador atual sejam resetadas e não interfiram em futuras partidas.
     currentPlayer = { name: "", score: "" }; //limpa a variável.
-    setCharacter(""); //limpa a variável.
+    setCharacter(""); //limpa a variável character.
 
     //atualiza a lista de playes do quadro de records.
     renderPlayersList();
   }
+
   // ao final do jogo pega a lista de players e renderiza (escreve) na tela.
   function renderPlayersList() {
     // Obtém a referência ao elemento <ul>
@@ -1288,7 +1314,7 @@ function game() {
 
     // Itera sobre a lista de jogadores e cria os <li>
     namesPlayers
-      .sort((a, b) => a.score < b.score)
+      .sort((a, b) => a.score < b.score) //ordena a lista de jogadores com base no score, do maior para o menor.
       .forEach((player) => {
         const li = document.createElement("li");
         li.textContent = `${player.name} - Score: ${player.score} - Char: ${player.character}`;
@@ -1306,10 +1332,7 @@ function game() {
     draw();
 
     //atualiza a posição dos inimigos e verifica colisões.
-    update(currentTime);
-
-    //verifica se o player chegou no endpoint.
-    winner();
+    update(currentTime);    
 
     for (let index = 0; index < nuvens.length; index++) {
       nuvens[index].draw(ctx, gridSize);
@@ -1318,7 +1341,11 @@ function game() {
 
     drawForegrounds();
 
+    //verifica se o player perdeu o jogo.
     gameover();
+
+    //verifica se o player chegou no endpoint.
+    winner();    
 
     requestAnimationFrame(loop);
   }
@@ -1370,6 +1397,6 @@ function game() {
   playAgainButton.addEventListener("click", () => {
     // Esconde a tela de game over quando o jogador clica no botão de jogar novamente,
     // permitindo que uma nova partida comece.
-    hideGameOverScreen();
+    hideGameScreen();
   });
 }
