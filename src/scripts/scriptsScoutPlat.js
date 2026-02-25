@@ -796,7 +796,7 @@ function setCharacter(value){
     }else{
         character = value;
     }
-    document.getElementById('nameCharacter').textContent = value ? "Você selecionou " + value[0].toUpperCase() + value.slice(1) : "";
+    document.getElementById('nameCharacter').textContent = value ? "Você selecionou " + value[0]?.toUpperCase() + value.slice(1) : "";
 }
 
 // Para tocar o sons de efeitos como pulo, click, game over etc.
@@ -804,7 +804,7 @@ function playEfeitos(newSource, volume = 0.2) {
   audioEfeitos.currentTime = 0; // Recomeça o som caso esteja tocando
   audioEfeitos.src = newSource;
   audioPlayer.volume = volume;
-  audioEfeitos.play();
+  audioEfeitos.play().catch(()=>{}); //o catch nesse caso é apenas para evitar erros caso o áudio seja disparado no console.
 }
 // fim aula 22 ----------------
 
@@ -1185,10 +1185,11 @@ function game() {
 
     //atualiza o conteúdo do elemento com as informações do jogador atual, como nome, score e HP.
     logStatus.innerHTML = `
-            Player: ${currentPlayer.name}<br/>
-            Score: ${currentPlayer.score || 0}<br/>
-            HP: ${player.hp}<br/>
-        `;
+      Player: ${currentPlayer.name}<br/>
+      Chacacter: ${currentPlayer.character[0]?.toUpperCase() + currentPlayer.character.slice(1)}<br/>
+      Score: ${currentPlayer.score || 0}<br/>
+      HP: ${player.hp}<br/>
+    `;
   }
 
   // Função para disparar um projétil
@@ -1281,7 +1282,7 @@ function game() {
       namesPlayers.push({
         ...currentPlayer,
         character:
-          currentPlayer.character[0].toUpperCase() +
+          currentPlayer.character[0]?.toUpperCase() +
           currentPlayer.character.slice(1),
       });
     } else { // se o jogador já existir na lista, atualiza as informações do jogador existente na lista (namesPlayers) usando o método map para criar um novo array. Para cada item na lista de jogadores, verifica se o nome do item é igual ao nome do jogador atual. Se for igual, retorna um novo objeto com as mesmas propriedades do currentPlayer, mas com a propriedade character formatada para ter a primeira letra maiúscula e o restante em minúscula. Se não for igual, retorna o item original sem alterações.
@@ -1290,7 +1291,7 @@ function game() {
           return {
             ...currentPlayer,
             character:
-              currentPlayer.character[0].toUpperCase() +
+              currentPlayer.character[0]?.toUpperCase() +
               currentPlayer.character.slice(1),
           };
         } else {
