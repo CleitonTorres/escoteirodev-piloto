@@ -695,6 +695,9 @@ let audioPlayer = null; //elemento de áudio que controla a trilha sonora do jog
 let audioEfeitos = null; //elemento de áudio que controla os efeitos sonoros.
 let currentPlayer = { name: "", score: 0, character: "" }; //objeto que armazena as informações do jogador atual.
 let namesPlayers = []; //lista de jogadores no ranking.
+let charMaria  = undefined; //será usada para capturar o elemento que tem id maria.
+let charLeo  = document.getElementById("leo"); //será usada para capturar o elemento que tem id leo.
+
 
 // objeto contendo os endereços de todos os efeitos sonoros que vamos usar no jogo.
 const efeitos = {
@@ -717,8 +720,10 @@ const inputElement = document.getElementById("namePlayer");
 
 document.addEventListener("DOMContentLoaded", () => {
   // Acessa o elemento <audio>
-  audioPlayer = document.getElementById("AudioPlayer");
-  audioEfeitos = document.getElementById("efeitos");
+  audioPlayer = document.getElementById("AudioPlayer"); //captura o elemento que tem id AudioPlayer e atribui a variável audioPlayer.
+  audioEfeitos = document.getElementById("efeitos"); //captura o elemento que tem id efeitos e atribui a variável audioEfeitos.
+  charMaria = document.getElementById('maria'); //captura o elemento que tem id maria e atribui a variável charMaria.
+  charLeo = document.getElementById('leo'); //captura o elemento que tem id leo e atribui a variável charLeo.
 
   // Controlar o volume (0.0 a 1.0)
   //chamamos essa função dentro do DOMContentLoaded para evitar erros do elemento ainda
@@ -736,34 +741,35 @@ function changeAudioSource(newSource, loop = false) {
 //aula 22 ----------------
 //a função select espera receber um id, ou seja, o nome do personagem selecionado maria ou leo.
 function select(id){
-    const charMaria  = document.getElementById('maria'); //captura o elemento que tem id maria.
-    const charLeo  = document.getElementById("leo"); //captura o elemento que tem id leo.
+  playEfeitos(efeitos.click); //executa o efeito sonoro de click.
 
-    playEfeitos(efeitos.click); //executa o efeito sonoro de click.
-
-    if(id === 'maria'){
-        charMaria.classList.toggle("selected"); //alterna entre os estilos de css que configuramos. Incluindo ou removendo.
-        charLeo.classList.remove("selected");
-    }else{
-        charLeo.classList.toggle("selected");
-        charMaria.classList.remove("selected");
-    }
-    //atribui o valor correspondente ao personagem selecionado ou remove a seleção.
-    setCharacter(id)
+  if(id === 'maria'){
+      charMaria.classList.toggle("selected"); //alterna entre os estilos de css que configuramos. Incluindo ou removendo.
+      charLeo.classList.remove("selected");
+  }else{
+      charLeo.classList.toggle("selected");
+      charMaria.classList.remove("selected");
+  }
+  //atribui o valor correspondente ao personagem selecionado ou remove a seleção.
+  setCharacter(id)
 }
 
 //fecha o modal com a seleção de personagens e inicia o jogo.
 function start(){
-    const modal = document.getElementById("boxSelector");
-    inputElement.value= ''; //limpa o valor do input com o nome do personagem.
+  const modal = document.getElementById("boxSelector");
+  inputElement.value= ''; //limpa o valor do input com o nome do personagem.
 
-if(character && currentPlayer.name !== ""){ //se o nome do jogador foi preenchido segue o código normalmente. Isso evita que o jogo inicie sem um jogador identificado.
-        modal.classList.add("hiddenModal");
-        playEfeitos(efeitos.ok); //dispara um efeito sonoro.
-        game(); //inicia o jogo.
-    }else{
-        alert("Falta selecionar um personagem ou fornecer seu nome de player!");
-    }    
+  if(character && currentPlayer.name !== ""){ //se o nome do jogador foi preenchido segue o código normalmente. Isso evita que o jogo inicie sem um jogador identificado.
+    charMaria.classList.remove("selected"); //remove a classe de seleção do personagem maria.
+    charLeo.classList.remove("selected"); //remove a classe de seleção do personagem leo.
+    
+    //adiciona a classe hiddenModal para esconder o modal de seleção de personagem.
+    modal.classList.add("hiddenModal");
+    playEfeitos(efeitos.ok); //dispara um efeito sonoro.
+    game(); //inicia o jogo.
+  }else{
+      alert("Falta selecionar um personagem ou fornecer seu nome de player!");
+  }    
 }
 
 //listener que ouve o evento de input do elemento que capturamos como inputElement.
@@ -1087,7 +1093,7 @@ function game() {
     });
 
     //atualiza score e outros dados do jogador no canto superior esquerdo do canvas.
-    console();
+    setLogInf();
 
     //desenha os projeteis disparados pelo jogador.
     projectiles.forEach((projectile) => {
@@ -1179,7 +1185,7 @@ function game() {
   }
 
   // Função para atualizar o console de informações do jogador.
-  function console() {
+  function setLogInf() {
     //pega o elemento HTML onde as informações do jogador serão exibidas.
     const logStatus = document.getElementById("logStatus");
 
