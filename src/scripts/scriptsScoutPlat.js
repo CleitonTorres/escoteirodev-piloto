@@ -8,6 +8,10 @@ class Player {
       initialY,
       type = "NPC" || "Player",
       showHitBox,
+      ctx,
+      gridSize,
+      tileCount, 
+      linhas,
   ) {
       this.character = character; //nome do personagem (maria ou leo).
       this.hp = 100; // vida do personagem.
@@ -23,6 +27,10 @@ class Player {
       this.animationFrame = 0; // velocidade da animação. O tempo que a animação leva para trocar entre sprites.
       this.width = 64; // largura do personagem.
       this.height = 64; // altura do personagem.
+      this.ctx = ctx; // referência ao contexto do canvas para desenhar o personagem.
+      this.gridSize = gridSize; //tamanho de cada tile do cenário, usado para calcular a posição do personagem em pixels.
+      this.tileCount = tileCount; //quantidade de tiles no cenário, usado para limitar o movimento do personagem.
+      this.linhas = linhas; //quantidade de linhas do cenário, usado para limitar o movimento do personagem.
       this.gameOver = false; // estado de game over.
       this.lastTime = 0; // variável usada para calcular a velocidade do loop.
 
@@ -84,7 +92,7 @@ class Player {
 
   // Função responsável por atualizar o estado do jogador a cada frame:
   // posição, velocidade e estados como "pulando" e "no chão".
-  update(currentTime, gravity, speed, floors, tileCount, gridSize, linhas) {
+  update(currentTime, gravity, speed, floors) {
     // Calcula o tempo entre o frame atual e o anterior (deltaTime)
     // Isso deixa o movimento mais estável, independente do FPS.
     const deltaTime = (currentTime - this.lastTime) / 1000; // convertendo para "segundos ajustados"
@@ -102,8 +110,8 @@ class Player {
     // Impede o jogador de sair dos limites horizontais do mapa/canvas
     if (this.x <= 0) {
     this.x = 0; // trava na borda esquerda
-    } else if (this.x >= tileCount - 1) {
-    this.x = tileCount - 1; // trava na borda direita
+    } else if (this.x >= this.tileCount - 1) {
+    this.x = this.tileCount - 1; // trava na borda direita
     }
     //-----------------------------------------------------------------
 
@@ -116,7 +124,7 @@ class Player {
 
     // Só checa colisão de pouso quando o jogador está descendo (yVelocity >= 0)
     if (this.yVelocity >= 0) {
-        if (this.isOnfloorCheck(floor, gridSize)) {
+        if (this.isOnfloorCheck(floor, this.gridSize)) {
         // Ajusta o jogador para ficar exatamente em cima da plataforma
         this.y = floor.y - 1;
 
@@ -142,7 +150,7 @@ class Player {
     }
 
     // Verifica colisão com o "chão final" do cenário (limite inferior)
-    if (this.y >= linhas - 2) {
+    if (this.y >= this.linhas - 2) {
       this.yVelocity = 0; // para de cair
       this.isJump = false; // não está pulando
       this.isOnFloor = true; // está no chão
@@ -150,27 +158,27 @@ class Player {
   }
 
   // Checa se o player está tocando no chão ou em uma plataforma
-  isOnfloorCheck(floor, gridSize) {
+  isOnfloorCheck(floor) {
       // Coordenada Y da parte de baixo do player ("pé"), em pixels
-      const playerBottom = (this.y * gridSize) + this.height;
+      const playerBottom = (this.y * this.gridSize) + this.height;
 
       // Limite esquerdo do player, em pixels
-      const leftPlayer = this.x * gridSize;
+      const leftPlayer = this.x * this.gridSize;
 
       // Limite direito do player, em pixels
-      const rightPlayer = (this.x + 1) * gridSize;
+      const rightPlayer = (this.x + 1) * this.gridSize;
 
       // Ajuste para deixar a colisão horizontal mais "justa"
       const ajusteRaioColision = this.width / 2;
 
       // Parte de cima da plataforma/chão, em pixels
-      const floorTop = floor.y * gridSize;
+      const floorTop = floor.y * this.gridSize;
 
       // Limite esquerdo da plataforma com ajuste de colisão
       const floorLeft = (floor.x * floor.width) + ajusteRaioColision;
 
       // Limite direito da plataforma com ajuste de colisão
-      const floorRight = floor.x * gridSize + floor.width - ajusteRaioColision;
+      const floorRight = floor.x * this.gridSize + floor.width - ajusteRaioColision;
 
       // Verifica se o pé do player está na altura da plataforma
       const isAboveFloor =
@@ -185,7 +193,7 @@ class Player {
   }
 
   // Função responsável por desenhar o player no canvas
-  draw(ctx, gridSize) {
+  draw() {
       let spriteArray;
 
       // Escolhe qual animação usar com base no estado do player
@@ -204,42 +212,42 @@ class Player {
       }
 
       // Desenha barra de HP (fundo cinza)
-      ctx.fillStyle = "grey";
-      ctx.fillRect(10, 10, 100, 20);
+      this.ctx.fillStyle = "grey";
+      this.ctx.fillRect(10, 10, 100, 20);
 
-      // Desenha vida atual (vermelho)
-      ctx.fillStyle = "red";
+      // Desenhida atual (vermelho)
+      this.ctx.fillStyle = "red";
 
       // a largura da barra de vida é proporcional à vida atual (hp).
-      ctx.fillRect(10, 10, this.hp, 20); 
+      this.ctx.fillRect(10, 10, this.hp, 20); 
 
       // Salva o estado atual do contexto antes de transformar
-      ctx.save();
+      this.ctx.save();
 
       // Se estiver em uma direção específica durante o pulo, espelha o sprite
       // se this.direction for true significa que o personagem está andando para a esquerda e precisa sofrer o flip.
       if (this.direction && this.isJump) {
-          ctx.scale(-1, 1); // Espelha horizontalmente
-          ctx.drawImage( // desenha a animação no canvas.
+          this.ctx.scale(-1, 1); // Espelha horizontalmente
+          this.ctx.drawImage( // desenha a animação no canvas.
               spriteArray[this.currentFrame], // Frame atual da animação
-              -(this.x * gridSize + this.width), // Ajuste de posição por causa do espelhamento
-              this.y * gridSize, // posição y.
+              -(this.x * this.gridSize + this.width), // Ajuste de posição por causa do espelhamento
+              this.y * this.gridSize, // posição y.
               this.width, // largura do personagem.
               this.height, // altura do personagem.
           );
       } else {
           // Desenho normal (sem espelhamento)
-          ctx.drawImage(
+          this.ctx.drawImage(
           spriteArray[this.currentFrame], // Frame atual da animação
-          this.x * gridSize,
-          this.y * gridSize,
+          this.x * this.gridSize,
+          this.y * this.gridSize,
           this.width,
           this.height,
           );
       }
 
       // Restaura o contexto original (remove scale e outras transformações)
-      ctx.restore();
+      this.ctx.restore();
 
       // Atualiza os frames da animação
       if (this.isJump) {
@@ -267,7 +275,7 @@ class Player {
   }
 
   //função que verifica se o personagem colidiu com algo.
-  isCollisionPlayer(collide, ctx) {
+  isCollisionPlayer(collide) {
     if (collide === null) return; //collide é o objeto com o qual queremos verificar a colisão. Se ele for nulo, não tem como verificar a colisão, então retornamos.
 
     const toleranceX = this.width / 3; //tolerância para a colisão no eixo x. Isso deixa a colisão mais "justa" e evita que o player colida quando estiver quase tocando o objeto.
@@ -279,7 +287,7 @@ class Player {
     const playerY2 = this.y * this.height + this.height - toleranceY;
 
     // Desenha a hitbox no canvas
-    if (this.showHitBox) this.drawHitBox(ctx, playerX1, playerY1, playerX2, playerY2);
+    if (this.showHitBox) this.drawHitBox(playerX1, playerY1, playerX2, playerY2);
 
     var colidiuX = false;
     var colidiuY = false;
@@ -308,10 +316,10 @@ class Player {
   }
 
   // Função para desenhar o hitbox no canvas
-  drawHitBox(ctx, x1, y1, x2, y2) {
-      ctx.strokeStyle = "green"; // Define a cor da borda
-      ctx.lineWidth = 2; // Define a espessura da borda
-      ctx.strokeRect(x1, y1, x2 - x1, y2 - y1); // Desenha o retângulo sem preenchimento
+  drawHitBox(x1, y1, x2, y2) {
+      this.ctx.strokeStyle = "green"; // Define a cor da borda
+      this.ctx.lineWidth = 2; // Define a espessura da borda
+      this.ctx.strokeRect(x1, y1, x2 - x1, y2 - y1); // Desenha o retângulo sem preenchimento
   }
 }
 
@@ -568,52 +576,6 @@ class Projectile {
   }
 }
 
-//classe da nuvem
-class Cloud {
-  constructor(x, y, width, height, speed) {
-    this.x = x;
-    this.y = y;
-    this.speed = speed;
-    this.width = width;
-    this.height = height;
-    this.currentFrame = 0;
-    this.animationFrame = 0;
-    this.lastTime = 0;
-    this.sprites = [new Image(), new Image(), new Image()];
-    for (let index = 0; index < this.sprites.length; index++) {
-      this.sprites[index].src =
-        `./src/assets/scoutPlat/clouds/cloud(${index}).png`;
-    }
-  }
-
-  update(currentTime, canvas, tileCount) {
-    const deltaTime = (currentTime - this.lastTime) / 1000; // Convertendo para segundos
-    this.lastTime = currentTime;
-    this.x -= this.speed * deltaTime;
-
-    // Se a nuvem sair da tela, marque-o para reiniciar
-    if (this.x < 0 || this.x > canvas.width) {
-      this.x = tileCount + 1;
-    }
-  }
-
-  draw(ctx, gridSize) {
-    ctx.drawImage(
-      this.sprites[this.currentFrame],
-      this.x * gridSize,
-      this.y * gridSize,
-      this.width,
-      this.height,
-    );
-
-    if (this.animationFrame % 20 === 0) {
-      // Altere 10 para ajustar a velocidade da animação
-      this.currentFrame = (this.currentFrame + 1) % this.sprites.length;
-    }
-    this.animationFrame++;
-  }
-}
-
 //classe da Bandeirola (flag) que fica tremulando no topo do mastro.
 class Flag {
   constructor(x, y, width, height, gridSize) {
@@ -658,25 +620,81 @@ class Flag {
 
 //classe da árvore
 class Tree {
-  constructor(x, y, width, height) {
+  constructor(x, y, width, height, gridSize, ctx) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
+    this.gridSize = gridSize;
+    this.ctx = ctx;
     this.currentFrame = 0;
     this.animationFrame = 0;
     this.lastTime = 0;
+
     this.sprites = [new Image()];
     for (let index = 0; index < this.sprites.length; index++) {
       this.sprites[index].src = `./src/assets/scoutPlat/arvores/arvore01.png`;
     }
   }
 
-  draw(ctx, gridSize) {
-    ctx.drawImage(
+  draw() {
+    this.ctx.drawImage(
       this.sprites[this.currentFrame],
-      this.x * gridSize,
-      this.y * gridSize,
+      this.x * this.gridSize,
+      this.y * this.gridSize,
+      this.width,
+      this.height,
+    );
+
+    if (this.animationFrame % 20 === 0) {
+      // Altere 10 para ajustar a velocidade da animação
+      this.currentFrame = (this.currentFrame + 1) % this.sprites.length;
+    }
+    this.animationFrame++;
+  }
+}
+
+//classe da nuvem
+class Cloud {
+  constructor(x, y, width, height, speed, canvas, ctx, gridSize, tileCount) {
+    this.x = x;
+    this.y = y;
+    this.speed = speed;
+    this.width = width;
+    this.height = height;
+    this.canvas = canvas;
+    this.ctx = ctx;
+    this.gridSize = gridSize;
+    this.tileCount = tileCount;
+
+    this.currentFrame = 0;
+    this.animationFrame = 0;
+    this.lastTime = 0;
+
+    this.sprites = [new Image(), new Image(), new Image()];
+    for (let index = 0; index < this.sprites.length; index++) {
+      this.sprites[index].src =
+        `./src/assets/scoutPlat/clouds/cloud(${index}).png`;
+    }
+  }
+
+  //função para atualizar a posição da nuvem no cenário, fazendo com que ela se mova lentamente de um lado para o outro.
+  update(currentTime) {
+    const deltaTime = (currentTime - this.lastTime) / 1000; // Convertendo para segundos
+    this.lastTime = currentTime;
+    this.x -= this.speed * deltaTime;
+
+    // Se a nuvem sair da tela, marque-o para reiniciar
+    if (this.x < 0 || this.x > this.canvas.width) {
+      this.x = this.tileCount + 1;
+    }
+  }
+
+  draw() {
+    this.ctx.drawImage(
+      this.sprites[this.currentFrame],
+      this.x * this.gridSize,
+      this.y * this.gridSize,
       this.width,
       this.height,
     );
@@ -697,7 +715,6 @@ let currentPlayer = { name: "", score: 0, character: "" }; //objeto que armazena
 let namesPlayers = []; //lista de jogadores no ranking.
 let charMaria  = undefined; //será usada para capturar o elemento que tem id maria.
 let charLeo  = document.getElementById("leo"); //será usada para capturar o elemento que tem id leo.
-
 
 // objeto contendo os endereços de todos os efeitos sonoros que vamos usar no jogo.
 const efeitos = {
@@ -831,7 +848,6 @@ function game() {
   const gameScreenTitle = document.getElementById("game-screen-title");
   const finalScoreDisplay = document.getElementById("finalScore");
 
-
   //variáveis de estado e física.
   let isGameover = false; //estado de game over.
   let speed = 3; //velocidade de movimento do personagem.
@@ -841,8 +857,12 @@ function game() {
 
   //aqui estamos instanciando (criando uma cópia) da classe Player que Apartir desse momento se tornar um objeto
   //chamado player e está armazenado em uma variável let para podermos acessar e alterar quando for necessário.
-  let player = new Player(character, 2, 8, "Player", false);
-  let npcBP = new Player("bp", 8, 8, "NPC", false);
+  let player = new Player(character, 2, 8, "Player", false, ctx, gridSize, tileCount, linhas);
+  
+  //lista de NPCs (personagens não jogáveis), nesse caso o BP (bandido pirata).
+  let npcs = [
+    new Player("bp", 8, 8, "NPC", false, ctx, gridSize, tileCount, linhas)
+  ]; 	
   
   //criação do chão e plataformas iniciais
   const floors = [
@@ -1007,6 +1027,7 @@ function game() {
       borderColor: "black",
     },
   ];
+
   //carrega os dados para desenhar o chão.
   // aqui estamos usando um loop para criar o chão do cenário, ele percorre a quantidade de tiles que temos no canvas e para cada tile ele adiciona um objeto representando uma parte do chão no array de floors. Dessa forma, o chão é criado dinamicamente com base na configuração do canvas e do gridSize, facilitando ajustes futuros caso seja necessário mudar o tamanho do grid ou do canvas.
   for (let index = 0; index < tileCount; index++) {
@@ -1047,23 +1068,37 @@ function game() {
   
   //nuvens
   const nuvens = [
-    new Cloud(14, 0.1, gridSize, gridSize, 0.5),
-    new Cloud(15, 0.5, gridSize, gridSize, 0.3),
-    new Cloud(15, 0.1, gridSize, gridSize, 0.4),
+    new Cloud(14, 0.1, gridSize, gridSize, 0.5, canvas, ctx, gridSize, tileCount),
+    new Cloud(15, 0.5, gridSize, gridSize, 0.3, canvas, ctx, gridSize, tileCount),
+    new Cloud(15, 0.1, gridSize, gridSize, 0.4, canvas, ctx, gridSize, tileCount),
   ];
 
-  //arvores
-  const trees = [new Tree(2, 7.8, gridSize + 10, gridSize + 20)];
-  const treesForeground = [new Tree(9, 7.2, gridSize + 10, gridSize * 2)];
+  //árvores que ficam no fundo do cenário, para dar um efeito de profundidade.
+  const trees = [
+    new Tree(2, 7.8, gridSize + 10, gridSize + 20, gridSize, ctx),
+  ];
 
+  // árvores que ficam na frente do cenário, para dar um efeito de profundidade.
+  const treesForeground = [
+    new Tree(9, 7.2, gridSize + 10, gridSize * 2, gridSize, ctx)
+  ];
 
   function drawBackground(x, y, width, height, color) {
-    ctx.fillStyle = color;
+    //define a cor de preenchimento para o fundo.
+    ctx.fillStyle = color; 
+
+    //desenha um retângulo preenchido que serve como o fundo do cenário, usando as coordenadas (x, y) e as dimensões (width, height) fornecidas.
     ctx.fillRect(x * gridSize, y * gridSize, width, height);
   }
 
   //função para desenhar o cenário do jogo, incluindo o chão, plataformas, inimigos, projéteis, player, NPCs e outros elementos visuais.
   function draw() {
+    //desenha as nuvens no cenário.
+    nuvens.forEach((cloud) => {
+      cloud.draw();
+    });
+
+    //desenha o fundo do cenário, nesse caso um retângulo verde que representa a grama. O chão e as plataformas serão desenhados por cima desse fundo.
     drawBackground(0, 8.5, canvas.width, gridSize / 2, "green");
 
     //aqui estamos usando o método forEach para percorrer a lista de plataformas (floors) e desenhar cada uma delas no canvas usando o método draw da classe Floor.
@@ -1100,21 +1135,32 @@ function game() {
       projectile.draw(ctx, gridSize);
     });
 
-    npcBP.draw(ctx, gridSize);
+    //desenha a bandeirola no cenário.
     flag01.draw(ctx);
 
-    trees.forEach((tree) => {
-      tree.draw(ctx, gridSize);
+    //desenha cada uma das árvores do background.
+    trees.forEach((tree) => { 
+      tree.draw();
     });
 
-    player.draw(ctx, gridSize);
+    //desenha os NPCs (personagens não jogáveis) no cenário.
+    npcs.forEach((npc) => { 
+      npc.draw();
+    });
+
+    //desenha o player por último para que ele fique na frente de todos os outros elementos do cenário.
+    player.draw();
+
+    treesForeground.forEach((tree) => { //desenha cada uma das árvores que ficam na frente do cenário.
+      tree.draw();
+    });
   }
 
   //função para atualizar o estado do jogo, como a posição do player, inimigos, projéteis e verificar colisões.
   function update(currentTime) {
     //verifica se o player colidiu com algum item coletável (moeda).
     itens.forEach((moeda) => {
-      if (player.isCollisionPlayer(moeda, ctx)) {
+      if (player.isCollisionPlayer(moeda)) {
         //toca o efeito sonoro de coleta de moeda.
         playEfeitos(efeitos.coin);
 
@@ -1151,7 +1197,7 @@ function game() {
       });
 
       //verifica colisão do inimigo no player.
-      if (player.isCollisionPlayer(enemy, ctx)) {
+      if (player.isCollisionPlayer(enemy)) {
         getHit(); //função que reduz o HP e dispara o efeito sonoro.
         enemy.x = Math.random() * 10; //reinicia a posição do inimigo para um local aleatório no eixo X.
         enemy.y = 1; //reinicia a posição do inimigo de cima para baixo no eixo Y.
@@ -1164,6 +1210,16 @@ function game() {
       if (projectile.markedForDeletion) {
         projectiles.splice(index, 1); // Remove o projétil do array
       }
+    });
+
+    //atualiza a posição das nuvens.
+    nuvens.forEach((cloud) => {
+      cloud.update(currentTime);
+    });
+
+    //atualiza os NPCs (personagens não jogáveis) do cenário.
+    npcs.forEach((npc) => { 
+      npc.update(currentTime, gravity, speed, floors);
     });
 
     //atualiza as informações relativas ao player.
@@ -1207,12 +1263,6 @@ function game() {
 
     // Toca o efeito sonoro de disparo
     playEfeitos(efeitos.shoot);
-  }
-
-  function drawForegrounds() {
-    treesForeground.forEach((tree) => {
-      tree.draw(ctx, gridSize);
-    });
   }
 
   //verifica se o player perdeu o jogo.
@@ -1339,14 +1389,7 @@ function game() {
     draw();
 
     //atualiza a posição dos inimigos e verifica colisões.
-    update(currentTime);    
-
-    for (let index = 0; index < nuvens.length; index++) {
-      nuvens[index].draw(ctx, gridSize);
-      nuvens[index].update(currentTime, canvas, tileCount);
-    }
-
-    drawForegrounds();
+    update(currentTime);
 
     //verifica se o player perdeu o jogo.
     gameover();

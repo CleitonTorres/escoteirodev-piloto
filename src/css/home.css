@@ -67,8 +67,13 @@ nav ul li a {
 } 
 nav ul li a:hover { 
     color: var(--cor-primaria); /* Mude a cor ao passar o mouse */ 
-    text-decoration: underline;  
+    text-decoration: underline; /* insere um sublinhado ao passar o mouse */
 } 
+/* melhore o estado de foco para acessibilidade */
+a:focus, button:focus, input:focus, textarea:focus {
+    outline: 2px solid #007bff; /* Borda azul ao focar */
+    outline-offset: 2px;
+}
 
 #habilidades ul{
     margin-left: 1em;
@@ -172,10 +177,7 @@ main section h2 {
     text-decoration: none; 
     margin-right: 10px; 
     margin-top: 10px;
-    transition: background-color 0.3s ease;
-} 
-.projeto-card a:hover { 
-    background-color: #0056b3; 
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 } 
 
 #saudacaoBtn{
@@ -209,10 +211,11 @@ main section h2 {
     border-radius: 5px; 
     cursor: pointer; 
     font-size: 1rem; 
-    transition: background-color 0.3s ease; 
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; 
 } 
-#contato form button:hover, #saudacaoBtn:hover { 
+#contato form button:hover, #saudacaoBtn:hover, .projeto-card a:hover { 
     background-color: #0056b3; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* estilos para menu mobile */
