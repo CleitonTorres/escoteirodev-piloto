@@ -27,6 +27,7 @@ class Player {
       this.animationFrame = 0; // velocidade da animação. O tempo que a animação leva para trocar entre sprites.
       this.width = 64; // largura do personagem.
       this.height = 64; // altura do personagem.
+      this.type = type; // tipo do personagem, pode ser NPC ou Player. Isso é usado para carregar os sprites corretos.
       this.ctx = ctx; // referência ao contexto do canvas para desenhar o personagem.
       this.gridSize = gridSize; //tamanho de cada tile do cenário, usado para calcular a posição do personagem em pixels.
       this.tileCount = tileCount; //quantidade de tiles no cenário, usado para limitar o movimento do personagem.
@@ -36,17 +37,13 @@ class Player {
 
       // Prepara os sprites instanciando elementos de imagens para cada frame e para cada animação.
       // cada animação é constituída por 3 sprites (3 frames ou 3 imagens).
-      this.sprites =
-      type === "Player"
-          ? {
-              // se o tipo informado for Player carrega todas as animações.
-              idle: [new Image(), new Image(), new Image()],
-              walk_left: [new Image(), new Image(), new Image()],
-              walk_right: [new Image(), new Image(), new Image()],
-              jump: [new Image(), new Image(), new Image()],
-          }
-          : //se for NPC preparar apenas a animação idle (parado).
-          { idle: [new Image(), new Image(), new Image()] };
+      this.sprites ={
+        // se o tipo informado for Player carrega todas as animações.
+        idle: [new Image(), new Image(), new Image()],
+        walk_left: [new Image(), new Image(), new Image()],
+        walk_right: [new Image(), new Image(), new Image()],
+        jump: [new Image(), new Image(), new Image()],
+      }
 
       // variável que vai ser usada para verificar se as imagens foram carregadas completamente.
       let loadedImages = 0;
@@ -56,37 +53,37 @@ class Player {
 
       //usa o loop forEch para percorrer os campos de this.sprites (idle, walk_left etc).
       keysSprites.forEach((key) => {
-      const firstLetters = key.substring(0, 4); //separa as palavras iniciais usadas no nome da pasta da animação.
+        const firstLetters = key.substring(0, 4); //separa as palavras iniciais usadas no nome da pasta da animação.
 
-      // para cada elemento de imagem da key (idle, walk e jump) carrega a imagem correspondente.
-      // para isso funcionar o nome da pasta precisar ser igual ao do character, e o nome da pasta
-      // da pasta da animação precisar ser igual ao nome usado nos campos (idle, walk e jump) de this.sprites e cada arquivo de imagem da animação devem estar nomeado de 0 a 3.
-      this.sprites[key].forEach((img, idx) => {
-          img.src = `./src/assets/scoutPlat/${character}/${firstLetters}/${key}(${idx}).png`;
-      });
+        // para cada elemento de imagem da key (idle, walk e jump) carrega a imagem correspondente.
+        // para isso funcionar o nome da pasta precisar ser igual ao do character, e o nome da pasta
+        // da pasta da animação precisar ser igual ao nome usado nos campos (idle, walk e jump) de this.sprites e cada arquivo de imagem da animação devem estar nomeado de 0 a 3.
+        this.sprites[key].forEach((img, idx) => {
+            img.src = `./src/assets/scoutPlat/${character}/${firstLetters}/${key}(${idx}).png`;
+        });
       });
 
       // Percorre cada chave do objeto/lista `keysSprites` (ex.: idle, run, jump...) para verificar se as imagens
       // foram carregadas corretamente.
       // isso é uma verificação de segurança para evitar erros.
       keysSprites.forEach((key) => {
-      // Para cada chave, percorre todas as imagens daquele grupo de sprites
-      this.sprites[key].forEach((img) => {
-          // Evento disparado quando a imagem termina de carregar
-          img.onload = () => {
-          loadedImages++; // Incrementa o contador de imagens carregadas
+        // Para cada chave, percorre todas as imagens daquele grupo de sprites
+        this.sprites[key].forEach((img) => {
+            // Evento disparado quando a imagem termina de carregar
+            img.onload = () => {
+              loadedImages++; // Incrementa o contador de imagens carregadas
 
-          // Quando atingir a quantidade esperada, mostra mensagem de sucesso
-          if (loadedImages === this.sprites.length) {
-              console.log("Imagens do player carregadas com sucesso");
-          }
-          };
+              // Quando atingir a quantidade esperada, mostra mensagem de sucesso
+              if (loadedImages === this.sprites.length) {
+                console.log("Imagens do player carregadas com sucesso");
+              }
+            };
 
-          // Evento disparado se der erro ao carregar a imagem
-          img.onerror = () => {
-          console.error("Erro ao carregar imagem do player: " + img.src);
-          };
-      });
+            // Evento disparado se der erro ao carregar a imagem
+            img.onerror = () => {
+              console.error("Erro ao carregar imagem do player: " + img.src);
+            };
+        });
       });
   }
 
@@ -109,9 +106,9 @@ class Player {
 
     // Impede o jogador de sair dos limites horizontais do mapa/canvas
     if (this.x <= 0) {
-    this.x = 0; // trava na borda esquerda
+      this.x = 0; // trava na borda esquerda
     } else if (this.x >= this.tileCount - 1) {
-    this.x = this.tileCount - 1; // trava na borda direita
+      this.x = this.tileCount - 1; // trava na borda direita
     }
     //-----------------------------------------------------------------
 
@@ -120,27 +117,27 @@ class Player {
 
     // Verifica colisão com cada plataforma/chão da lista
     for (let index = 0; index < floors.length; index++) {
-    const floor = floors[index];
+      const floor = floors[index];
 
-    // Só checa colisão de pouso quando o jogador está descendo (yVelocity >= 0)
-    if (this.yVelocity >= 0) {
+      // Só checa colisão de pouso quando o jogador está descendo (yVelocity >= 0)
+      if (this.yVelocity >= 0) {
         if (this.isOnfloorCheck(floor, this.gridSize)) {
-        // Ajusta o jogador para ficar exatamente em cima da plataforma
-        this.y = floor.y - 1;
+          // Ajusta o jogador para ficar exatamente em cima da plataforma
+          this.y = floor.y - 1;
 
-        // Zera a velocidade vertical porque ele "pousou"
-        this.yVelocity = 0;
+          // Zera a velocidade vertical porque ele "pousou"
+          this.yVelocity = 0;
 
-        // Ao tocar o chão, não está mais pulando
-        this.isJump = false;
+          // Ao tocar o chão, não está mais pulando
+          this.isJump = false;
 
-        // Marca que está sobre uma superfície
-        this.isOnFloor = true;
+          // Marca que está sobre uma superfície
+          this.isOnFloor = true;
 
-        // Para o loop, pois já encontrou uma colisão válida
-        break;
+          // Para o loop, pois já encontrou uma colisão válida
+          break;
         }
-    }
+      }
     }
 
     // Se não está no chão/plataforma, aplica gravidade (queda)
@@ -215,7 +212,7 @@ class Player {
       this.ctx.fillStyle = "grey";
       this.ctx.fillRect(10, 10, 100, 20);
 
-      // Desenhida atual (vermelho)
+      // Desenha barra atual de hp (vermelho)
       this.ctx.fillStyle = "red";
 
       // a largura da barra de vida é proporcional à vida atual (hp).
@@ -236,14 +233,14 @@ class Player {
               this.height, // altura do personagem.
           );
       } else {
-          // Desenho normal (sem espelhamento)
-          this.ctx.drawImage(
-          spriteArray[this.currentFrame], // Frame atual da animação
-          this.x * this.gridSize,
-          this.y * this.gridSize,
-          this.width,
-          this.height,
-          );
+        // Desenho normal (sem espelhamento)
+        this.ctx.drawImage(
+        spriteArray[this.currentFrame], // Frame atual da animação
+        this.x * this.gridSize,
+        this.y * this.gridSize,
+        this.width,
+        this.height,
+        );
       }
 
       // Restaura o contexto original (remove scale e outras transformações)
@@ -253,12 +250,12 @@ class Player {
       if (this.isJump) {
           // avança até o último frame e para nele
           if (this.animationFrame % 10 === 0 && this.currentFrame < spriteArray.length - 1) {
-              this.currentFrame++;
+            this.currentFrame++;
           } 
       } else {
-          // No chão (idle/andar), avança frame mais lentamente
+          // No chão (idle/andar), avança normalmente e loopa a animação
           if (this.animationFrame % 10 === 0) {
-          this.currentFrame = (this.currentFrame + 1) % spriteArray.length;
+            this.currentFrame = (this.currentFrame + 1) % spriteArray.length;
           }
       }
 
@@ -317,7 +314,7 @@ class Player {
 
   // Função para desenhar o hitbox no canvas
   drawHitBox(x1, y1, x2, y2) {
-      this.ctx.strokeStyle = "green"; // Define a cor da borda
+    this.ctx.strokeStyle = "green"; // Define a cor da borda
       this.ctx.lineWidth = 2; // Define a espessura da borda
       this.ctx.strokeRect(x1, y1, x2 - x1, y2 - y1); // Desenha o retângulo sem preenchimento
   }
@@ -855,15 +852,6 @@ function game() {
   let gravity = 15; // força da gravidade sobre o personagem.
   const damage = 10; // dano que os inimigos aplicam no personagem.
 
-  //aqui estamos instanciando (criando uma cópia) da classe Player que Apartir desse momento se tornar um objeto
-  //chamado player e está armazenado em uma variável let para podermos acessar e alterar quando for necessário.
-  let player = new Player(character, 2, 8, "Player", false, ctx, gridSize, tileCount, linhas);
-  
-  //lista de NPCs (personagens não jogáveis), nesse caso o BP (bandido pirata).
-  let npcs = [
-    new Player("bp", 8, 8, "NPC", false, ctx, gridSize, tileCount, linhas)
-  ]; 	
-  
   //criação do chão e plataformas iniciais
   const floors = [
     {
@@ -1031,7 +1019,7 @@ function game() {
   //carrega os dados para desenhar o chão.
   // aqui estamos usando um loop para criar o chão do cenário, ele percorre a quantidade de tiles que temos no canvas e para cada tile ele adiciona um objeto representando uma parte do chão no array de floors. Dessa forma, o chão é criado dinamicamente com base na configuração do canvas e do gridSize, facilitando ajustes futuros caso seja necessário mudar o tamanho do grid ou do canvas.
   for (let index = 0; index < tileCount; index++) {
-    floors.push({
+    floors.unshift({
       x: index, //posição x baseada no índice do loop.
       y: linhas - 1, //posição y fixa para o chão (última linha do canvas).
       width: gridSize, //largura de um tile.
@@ -1040,6 +1028,15 @@ function game() {
       borderColor: "", //cor da borda do chão, caso queira adicionar uma borda.
     });
   }
+
+  //aqui estamos instanciando (criando uma cópia) da classe Player que Apartir desse momento se tornar um objeto
+  //chamado player e está armazenado em uma variável let para podermos acessar e alterar quando for necessário.
+  let player = new Player(character, 2, floors[0].y-1, "Player", false, ctx, gridSize, tileCount, linhas);
+  
+  //lista de NPCs (personagens não jogáveis), nesse caso o BP (bandido pirata).
+  let npcs = [
+    new Player("bp", 8, floors[0].y-1, "NPC", false, ctx, gridSize, tileCount, linhas)
+  ]; 	
 
   var itens = [
     new Item(5, 6.5, gridSize / 2, gridSize / 2), //instanciação de itens usando a classe Item, cada item tem uma posição (x, y) e um tamanho (width, height).
@@ -1075,12 +1072,12 @@ function game() {
 
   //árvores que ficam no fundo do cenário, para dar um efeito de profundidade.
   const trees = [
-    new Tree(2, 7.8, gridSize + 10, gridSize + 20, gridSize, ctx),
+    new Tree(2, floors[0].y - 1.2, gridSize + 10, gridSize + 20, gridSize, ctx),
   ];
 
   // árvores que ficam na frente do cenário, para dar um efeito de profundidade.
   const treesForeground = [
-    new Tree(9, 7.2, gridSize + 10, gridSize * 2, gridSize, ctx)
+    new Tree(9, floors[0].y - 1.5, gridSize + 10, gridSize * 2, gridSize, ctx)
   ];
 
   function drawBackground(x, y, width, height, color) {
@@ -1099,7 +1096,7 @@ function game() {
     });
 
     //desenha o fundo do cenário, nesse caso um retângulo verde que representa a grama. O chão e as plataformas serão desenhados por cima desse fundo.
-    drawBackground(0, 8.5, canvas.width, gridSize / 2, "green");
+    drawBackground(0, floors[0].y - 1, canvas.width, gridSize, "green");
 
     //aqui estamos usando o método forEach para percorrer a lista de plataformas (floors) e desenhar cada uma delas no canvas usando o método draw da classe Floor.
     floors.forEach(floor => {
