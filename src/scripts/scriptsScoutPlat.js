@@ -1035,7 +1035,8 @@ function game() {
   
   //lista de NPCs (personagens não jogáveis), nesse caso o BP (bandido pirata).
   let npcs = [
-    new Player("bp", 8, floors[0].y-1, "NPC", false, ctx, gridSize, tileCount, linhas)
+    new Player("bp", 8, floors[0].y-1, "NPC", false, ctx, gridSize, tileCount, linhas),
+    new Player("bp", 10, floors[0].y-3, "NPC", false, ctx, gridSize, tileCount, linhas)
   ]; 	
 
   var itens = [
@@ -1382,11 +1383,11 @@ function game() {
     //limpa o canvas a cada frame para redesenhar o jogo.
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    //desenha o cenário, player, inimigos e itens.
-    draw();
-
     //atualiza a posição dos inimigos e verifica colisões.
     update(currentTime);
+
+    //desenha o cenário, player, inimigos e itens.
+    draw();
 
     //verifica se o player perdeu o jogo.
     gameover();
