@@ -45,9 +45,12 @@ header {
     color: var(--cor-texto-secundario);
     width: 100%;
 } 
-header h1 { 
+header h1, header a { 
     color: var(--cor-texto-secundario); 
 } 
+header a:hover{
+    opacity: 0.9;
+}
 nav ul { 
     list-style: none; 
     display: flex; 
@@ -104,6 +107,9 @@ main section, #sobre_mim {
 main section h2 { 
     color: var(--cor-primaria); 
     margin-bottom: 1rem; 
+}
+main section div {
+    margin-top: 20px;
 }
 #sobre_mim{
     text-align: center;
@@ -179,6 +185,9 @@ main section h2 {
     margin-top: 10px;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
 } 
+.projeto-card p{
+    text-align: justify;
+}
 
 #saudacaoBtn{
     background-color: #343a40;
